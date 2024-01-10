@@ -1,0 +1,22 @@
+{
+  "name": "gardium",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 3500 --open=aa/ & npm run sass",
+    "build": "vite build --emptyOutDir --sourcemap --force",
+    "preview": "vite preview",
+    "watch": "vite build --watch",
+    "sync": "browser-sync --watch reload",
+    "sass": "sass -w src/static/style/scss/style.scss:src/static/style/style.css"
+  },
+  "devDependencies": {
+    "sass": "^1.69.7",
+    "vite": "^5.0.8"
+  },
+  "dependencies": {
+    "dat.gui": "^0.7.9",
+    "gsap": "^3.12.4"
+  }
+}
