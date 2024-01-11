@@ -25,7 +25,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
     const delta = clock.getDelta();
 
     // if(mixer){
-    //   mixer.update( delta ); //애니메이션 플레이어. 애니메이션을 업데이트합니다. (delta 값 사용)
+    //   mixer.update( delta ); //애니메이션 플레이어. 애니메이션을 업데이트합니다. (delta 값 사용), 애니메이션 있는지 확인용임
     // }
 
     if ( isRequestRender ) {
@@ -63,7 +63,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 
 	// Light
-	const ambientLight = new THREE.AmbientLight('white', 1);
+	const ambientLight = new THREE.AmbientLight('white', 2);
 	scene.add(ambientLight);
 
 
@@ -91,6 +91,16 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
       // camera
       sceneCamera = complex.children.find(e => e.name == '카메라');
+
+      //Mesh
+      const textureLoader = new THREE.TextureLoader();
+
+      const screenMesh = complex.children.find(e => e.name == 'avideo-1');;
+      const src = `/resources/images/cat.webp`;
+      const imageTexture = textureLoader.load(src);
+
+      imageTexture.colorSpace = THREE.SRGBColorSpace; // 이미지 색감 표현을 위한 encoding 형태
+      screenMesh.material = new THREE.MeshStandardMaterial({ map: imageTexture, side: THREE.DoubleSide });
       
       // animation
       mixer = new THREE.AnimationMixer(complex);
