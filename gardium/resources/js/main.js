@@ -20,12 +20,13 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 		antialias: true
 	});
 
-  const render = function () {
+  const draw = function () {
 
     const delta = clock.getDelta();
 
     // if(mixer){
     //   mixer.update( delta ); //애니메이션 플레이어. 애니메이션을 업데이트합니다. (delta 값 사용), 애니메이션 있는지 확인용임
+    //   console.log(mixer)
     // }
 
     if ( isRequestRender ) {
@@ -40,7 +41,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
       isRequestRender = false;
     }
   
-    window.requestAnimationFrame(render);
+    window.requestAnimationFrame(draw);
   };
 
   renderer.setClearColor('white');
@@ -73,7 +74,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 
 	// Dat GUI
-	const gui = new dat.GUI();
+	// const gui = new dat.GUI();
 	// gui.add(camera.position, 'x', -5, 5, 0.1).name('카메라 X');
 	// gui.add(camera.position, 'y', -5, 15, 0.1).name('카메라 Y');
 	// gui.add(camera.position, 'z', 2, 10, 0.1).name('카메라 Z');
@@ -127,7 +128,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 		camera.aspect = window.innerWidth / window.innerHeight;
 		camera.updateProjectionMatrix();
 		renderer.setSize(window.innerWidth, window.innerHeight);
-		renderer.render(scene, camera);
+		renderer.draw(scene, camera);
 	}
 
   //=========wheel 이벤트=========
@@ -184,4 +185,4 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 	window.addEventListener('resize', setSize);
   canvas.addEventListener('wheel', onWheel, { passive: false });
 
-  render(); //로드 완료되면 실행시켜줘야하는 그리기 함수
+  draw(); //로드 완료되면 실행시켜줘야하는 그리기 함수
