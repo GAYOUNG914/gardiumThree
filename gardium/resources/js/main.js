@@ -110,6 +110,160 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
       anim.duration = gltf.animations[0].duration - 0.0000000001;
       mixer.setTime(0);
 
+      // console.log(gltf.animations[0])// duration이 이상하게 나오는뎁숑
+
+      //버튼클릭
+      const animDuration = anim.duration;
+      const animFrames = 250;
+    
+      function mapBtnClick1(){
+        const directionFrame = 25; // 목적지 애니메이션 프레임 -- 블렌더에서 확인 가능
+        const directionTime = directionFrame / animFrames * animDuration; // 목적지 프레임에 대한 시간 값 계산
+        const directionProgress = directionTime / animDuration;
+        const destinationTo = directionProgress * 10000; 
+      
+        animator.to = destinationTo;
+        animator.tween && animator.tween.kill(); 
+        animator.tween = gsap.to(animator, {
+        time: animator.to,
+        ease: 'Power1.easeInOut',
+        duration: 1,
+        onUpdate: function() {
+          // animator progress 계산
+          animator.progress = Math.max(0, Math.min(1, animator.time/10000));
+      
+          // 애니메이션 믹서를 (총 애니메이션 시간 * progress) 시간으로 보내서 애니메이션 이동
+          const aniTime = animator.progress * anim.duration;
+          mixer.setTime(aniTime);
+      
+          renderRequest();
+            }
+          });
+        mixer.setTime(directionTime);
+        renderRequest();
+      }
+      function mapBtnClick2(){
+        const directionFrame = 72; // 목적지 애니메이션 프레임 -- 블렌더에서 확인 가능
+        const directionTime = directionFrame / animFrames * animDuration; // 목적지 프레임에 대한 시간 값 계산
+        const directionProgress = directionTime / animDuration;
+        const destinationTo = directionProgress * 10000; 
+      
+        animator.to = destinationTo;
+        animator.tween && animator.tween.kill(); 
+        animator.tween = gsap.to(animator, {
+        time: animator.to,
+        ease: 'Power1.easeInOut',
+        duration: 1,
+        onUpdate: function() {
+          // animator progress 계산
+          animator.progress = Math.max(0, Math.min(1, animator.time/10000));
+      
+          // 애니메이션 믹서를 (총 애니메이션 시간 * progress) 시간으로 보내서 애니메이션 이동
+          const aniTime = animator.progress * anim.duration;
+          mixer.setTime(aniTime);
+      
+          renderRequest();
+            }
+          });
+        mixer.setTime(directionTime);
+        renderRequest();
+      }
+      function mapBtnClick3(){
+        const directionFrame = 122; // 목적지 애니메이션 프레임 -- 블렌더에서 확인 가능
+        const directionTime = directionFrame / animFrames * animDuration; // 목적지 프레임에 대한 시간 값 계산
+        const directionProgress = directionTime / animDuration;
+        const destinationTo = directionProgress * 10000; 
+      
+        animator.to = destinationTo;
+        animator.tween && animator.tween.kill(); 
+        animator.tween = gsap.to(animator, {
+        time: animator.to,
+        ease: 'Power1.easeInOut',
+        duration: 1,
+        onUpdate: function() {
+          // animator progress 계산
+          animator.progress = Math.max(0, Math.min(1, animator.time/10000));
+      
+          // 애니메이션 믹서를 (총 애니메이션 시간 * progress) 시간으로 보내서 애니메이션 이동
+          const aniTime = animator.progress * anim.duration;
+          mixer.setTime(aniTime);
+      
+          renderRequest();
+            }
+          });
+        mixer.setTime(directionTime);
+        renderRequest();
+      }
+      function mapBtnClick4(){
+        const directionFrame = 204; // 목적지 애니메이션 프레임 -- 블렌더에서 확인 가능
+        const directionTime = directionFrame / animFrames * animDuration; // 목적지 프레임에 대한 시간 값 계산
+        const directionProgress = directionTime / animDuration;
+        const destinationTo = directionProgress * 10000; 
+      
+        animator.to = destinationTo;
+        animator.tween && animator.tween.kill(); 
+        animator.tween = gsap.to(animator, {
+        time: animator.to,
+        ease: 'Power1.easeInOut',
+        duration: 1,
+        onUpdate: function() {
+          // animator progress 계산
+          animator.progress = Math.max(0, Math.min(1, animator.time/10000));
+      
+          // 애니메이션 믹서를 (총 애니메이션 시간 * progress) 시간으로 보내서 애니메이션 이동
+          const aniTime = animator.progress * anim.duration;
+          mixer.setTime(aniTime);
+      
+          renderRequest();
+            }
+          });
+        mixer.setTime(directionTime);
+        renderRequest();
+      }
+      function mapBtnClick5(){
+        const directionFrame = 250; // 목적지 애니메이션 프레임 -- 블렌더에서 확인 가능
+        const directionTime = directionFrame / animFrames * animDuration; // 목적지 프레임에 대한 시간 값 계산
+        const directionProgress = directionTime / animDuration;
+        const destinationTo = directionProgress * 10000; 
+      
+        animator.to = destinationTo;
+        animator.tween && animator.tween.kill(); 
+        animator.tween = gsap.to(animator, {
+        time: animator.to,
+        ease: 'Power1.easeInOut',
+        duration: 1,
+        onUpdate: function() {
+          // animator progress 계산
+          animator.progress = Math.max(0, Math.min(1, animator.time/10000));
+      
+          // 애니메이션 믹서를 (총 애니메이션 시간 * progress) 시간으로 보내서 애니메이션 이동
+          const aniTime = animator.progress * anim.duration;
+          mixer.setTime(aniTime);
+      
+          renderRequest();
+            }
+          });
+        mixer.setTime(directionTime);
+        renderRequest();
+      }
+    
+      document.querySelector('.btn[data-location="tutorial"]').addEventListener('click',function(){
+        mapBtnClick1();
+      });
+      document.querySelector('.btn[data-location="hall-a"]').addEventListener('click',function(){
+        mapBtnClick2();
+      });
+      document.querySelector('.btn[data-location="hall-b"]').addEventListener('click',function(){
+        mapBtnClick3();
+      });
+      document.querySelector('.btn[data-location="hall-c"]').addEventListener('click',function(){
+        mapBtnClick4();
+      });
+      document.querySelector('.btn[data-location="exit"]').addEventListener('click',function(){
+        mapBtnClick5();
+      });
+
+    
       scene.add(complex); //메쉬를 scene에 추가
 
       renderRequest();
@@ -121,6 +275,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
     }
   );
 
+
+
 	// 그리기
 	const clock = new THREE.Clock();
 
@@ -130,6 +286,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		renderer.draw(scene, camera);
 	}
+  
 
   //=========wheel 이벤트=========
   let startY, moveY;
@@ -148,11 +305,13 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
       onAnimate(distance);
     }
 
-    console.log(animator.progress)
+    // console.log(animator.progress)
 
   }
 
   //=========카메라 애니메이션=========
+  const popupTarget = { time: 0.5, elem: document.querySelector('.popup') }
+
   const onAnimate = function (distance) {
     const to = animator.to + distance;
   
@@ -170,6 +329,49 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
           
           if ( animator.progress == 1 ) animator.time = 10000;
           if ( animator.progress == 0 ) animator.time = 0;
+
+          // * 팝업 오픈
+          console.log(aniTime - popupTarget.time)
+
+          // let popupOpen =  false;
+
+          if ( Math.abs(aniTime - popupTarget.time) > 0.5 && Math.abs(aniTime - popupTarget.time) < 0.7  ) { // 0.5은 임의로 설정한 gap
+            // popupOpen = true;
+            if (!popupTarget.elem.classList.contains('on') ) {
+              popupTarget.elem.classList.add('on');
+              // popupTarget.elem.style.opacity = aniTime / 0.2;
+            }
+          }else if( Math.abs(aniTime - popupTarget.time) > 2.1 && Math.abs(aniTime - popupTarget.time) < 2.3  ) { // 0.5은 임의로 설정한 gap
+            // popupOpen = true;
+            if (!popupTarget.elem.classList.contains('on') ) {
+              popupTarget.elem.classList.add('on');
+              // popupTarget.elem.style.opacity = aniTime / 0.2;
+            }
+          }else if( Math.abs(aniTime - popupTarget.time) > 3.8 && Math.abs(aniTime - popupTarget.time) < 4.1  ) { // 0.5은 임의로 설정한 gap
+            // popupOpen = true;
+            if (!popupTarget.elem.classList.contains('on') ) {
+              popupTarget.elem.classList.add('on');
+              // popupTarget.elem.style.opacity = aniTime / 0.2;
+            }
+          }else if( Math.abs(aniTime - popupTarget.time) > 7.0 && Math.abs(aniTime - popupTarget.time) < 7.3  ) { // 0.5은 임의로 설정한 gap
+            // popupOpen = true;
+            if (!popupTarget.elem.classList.contains('on') ) {
+              popupTarget.elem.classList.add('on');
+              // popupTarget.elem.style.opacity = aniTime / 0.2;
+            }
+          }else if( Math.abs(aniTime - popupTarget.time) > 8.0 && Math.abs(aniTime - popupTarget.time) < 8.3  ) { // 0.5은 임의로 설정한 gap
+            // popupOpen = true;
+            if (!popupTarget.elem.classList.contains('on') ) {
+              popupTarget.elem.classList.add('on');
+              // popupTarget.elem.style.opacity = aniTime / 0.2;
+            }
+          }
+          else{
+            if (popupTarget.elem.classList.contains('on') ) {
+              popupTarget.elem.classList.remove('on');
+            }
+          }
+          // popupOpen = false;
   
           renderRequest();
         },
