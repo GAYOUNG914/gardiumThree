@@ -5,10 +5,35 @@ import gsap from 'gsap';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
+const $container = document.querySelector('.container')
+const canvas = document.querySelector('#three-canvas');
+const containerRect = canvas.getBoundingClientRect();
+const $currentPointer = document.querySelector('.current-pointer');
+const $map = document.querySelector('.map');
+const $prevBtn = document.querySelector('.popup .prev');
+const $nextBtn = document.querySelector('.next');
+
+function Mobile() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+let isMobile = Mobile();
+
+const animFrames = 250;
+// const animDuration = anim.duration;
+const animDuration = 10.416666984458105;
+const $popup = document.querySelector('.popup');
+const locationInfos = [
+  { location: 'tutorial',name: 'Section 01',elem: $container.querySelector('.popup .inner[data-pop="tutorial"]'), time: [25/animFrames  * animDuration], type: 'stop', isConfirm: false, },
+  { location: 'hall-a',  name: 'Section 02',elem: $container.querySelector('.popup .inner[data-pop="hall-a"]'), time: [60/animFrames * animDuration], type: 'stop', isConfirm: false, },
+  { location: 'hall-b',  name: 'Section 03',elem: $container.querySelector('.popup .inner[data-pop="hall-b"]'), time: [108/animFrames * animDuration], type: 'stop', isConfirm: false, },
+  { location: 'hall-c',  name: 'Section 04',elem: $container.querySelector('.popup .inner[data-pop="hall-c"]'), time: [204/animFrames * animDuration], type: 'stop', isConfirm: false, },
+  // { location: 'exit', name: 'Section 05',elem: $container.querySelector('.popup[data-pop="exit"]'),time: [1045/animFrames * animDuration],type: 'stop', isConfirm: false, },
+  { location: 'end',  name: '',  elem: $container.querySelector('.popup .inner[data-pop="end"]'), time: [animDuration - 0.001],type: 'pass', isConfirm: false, size: null, fitElem: $container.querySelector('.popup[data-pop="end"] .contents-end'), fitRect: null, },
+];
+
 
 	// Renderer
-	const canvas = document.querySelector('#three-canvas');
-  const containerRect = canvas.getBoundingClientRect();
   let isRequestRender;
 
   const renderRequest = function (text) {
@@ -23,11 +48,6 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
   const draw = function () {
 
     const delta = clock.getDelta();
-
-    // if(mixer){
-    //   mixer.update( delta ); //애니메이션 플레이어. 애니메이션을 업데이트합니다. (delta 값 사용), 애니메이션 있는지 확인용임
-    //   console.log(mixer)
-    // }
 
     if ( isRequestRender ) {
       if ( sceneCamera ) {
@@ -44,45 +64,68 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
     window.requestAnimationFrame(draw);
   };
 
-  renderer.setClearColor('white');
-	renderer.setSize(window.innerWidth, window.innerHeight);
-	renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : 1);
+  renderer.setClearColor(0x000000, 1.0);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(window.innerWidth, window.innerHeight);
 
 	// Scene
 	const scene = new THREE.Scene();
 
 	// Camera
-	const camera = new THREE.PerspectiveCamera(
-		80, //카메라시야각
-		window.innerWidth / window.innerHeight, //화면의 가로세로비율 (화면너비/높이)
-		0.1, //이만큼 가까이가면 안보임
-    1000 //이정도 멀리가면 안보임
-
-	);
+  const fov = isMobile ? 100 : 70;
+  const camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 100);
 
 	scene.add(camera);
 
 
 	// Light
-	const ambientLight = new THREE.AmbientLight('white', 2);
-	scene.add(ambientLight);
+  const light = new THREE.AmbientLight('#fff', 2);
+  scene.add(light);
 
 
   //Controls
   const controls = new OrbitControls(camera, renderer.domElement); //orbitControls는 파라미터 두 개를 받는다. camera와 돔엘리먼트
 
+  // Loading
+  // document.querySelector('.content-loading').classList.add('active');
+  THREE.DefaultLoadingManager.onProgress = function (url, itemsLoaded, itemsTotal) {
+      if (itemsLoaded === itemsTotal) {
+          // setEvent();
+          // setPopupEvent();
+          renderRequest();
+      }
+  };
 
-
-	// Dat GUI
-	// const gui = new dat.GUI();
-	// gui.add(camera.position, 'x', -5, 5, 0.1).name('카메라 X');
-	// gui.add(camera.position, 'y', -5, 15, 0.1).name('카메라 Y');
-	// gui.add(camera.position, 'z', 2, 10, 0.1).name('카메라 Z');
+  const screenMeshes = [];
+  const screenMeshNames = 'avideo-1, avideo-2, cg-cut-1, cg-cut-2, cg-cut-3, cg-cut-4, cg-cut-5, cg-cut-6, cg-cut-7, cg-cut-8, cg-cut-9, cg-cut-10, unit-74, unit-84, unit-101, unit-124, unit-125, unit-138, end,  '.split(', ');
+  const resourcesPath = '/resources/images/';
+  const screenInfos = [
+    { location: 'avideo-1',  image: `${resourcesPath}cat.webp`,    imageMob: `${resourcesPath}images/cat.webp` },
+    { location: 'avideo-2',  image: `${resourcesPath}pets2.webp`,    imageMob: `${resourcesPath}images/pets2.webp` },
+    { location: 'cg-cut-1',  image: `${resourcesPath}cat3.webp`,  imageMob: `${resourcesPath}images/cat3.webp` },
+    { location: 'cg-cut-2',  image: `${resourcesPath}hedgehog4.webp`,  imageMob: `${resourcesPath}hedgehog4.webp` },
+    { location: 'cg-cut-3',  image: `${resourcesPath}hedgehog4.webp`,  imageMob: `${resourcesPath}hedgehog4.webp` },
+    { location: 'cg-cut-4',  image: `${resourcesPath}hedgehog4.webp`,  imageMob: `${resourcesPath}hedgehog4.webp` },
+    { location: 'cg-cut-5',  image: `${resourcesPath}hedgehog4.webp`,  imageMob: `${resourcesPath}hedgehog4.webp` },
+    { location: 'cg-cut-6',  image: `${resourcesPath}hedgehog4.webp`,  imageMob: `${resourcesPath}hedgehog4.webp` },
+    { location: 'cg-cut-7',  image: `${resourcesPath}fox5.webp`,  imageMob: `${resourcesPath}fox5.webp` },
+    { location: 'cg-cut-8',  image: `${resourcesPath}fox5.webp`,  imageMob: `${resourcesPath}fox5.webp` },
+    { location: 'cg-cut-9',  image: `${resourcesPath}fox5.webp`,  imageMob: `${resourcesPath}fox5.webp` },
+    { location: 'cg-cut-10', image: `${resourcesPath}fox5.webp`,  imageMob: `${resourcesPath}fox5.webp` },
+    { location: 'unit-74',   image: `${resourcesPath}fox6.webp`, imageMob: `${resourcesPath}fox6.webp` },
+    { location: 'unit-84',   image: `${resourcesPath}fox6.webp`, imageMob: `${resourcesPath}fox6.webp` },
+    { location: 'unit-101',  image: `${resourcesPath}church.webp`,imageMob: `${resourcesPath}church.webp` },
+    { location: 'unit-124',  image: `${resourcesPath}church.webp`,imageMob: `${resourcesPath}church.webp` },
+    { location: 'unit-125',  image: `${resourcesPath}church.webp`,imageMob: `${resourcesPath}church.webp` },
+    { location: 'unit-138',  image: `${resourcesPath}church.webp`,imageMob: `${resourcesPath}church.webp` },
+    { location: 'end',       image: `${resourcesPath}fox7.webp`,    imageMob: `${resourcesPath}fox7.webp` }
+  ]
 
   // gltf loader
   const gltfLoader = new GLTFLoader();
   let anim, mixer, sceneCamera;
   let animator = {processing: false, time: 0, to: 0, duration: 0, progress: 0, tween: null};
+  const meshes = [];
 
   gltfLoader.load(
     '/resources/models/gardium1.gltf', 
@@ -96,12 +139,28 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
       //Mesh
       const textureLoader = new THREE.TextureLoader();
 
-      const screenMesh = complex.children.find(e => e.name == 'avideo-1');;
-      const src = `/resources/images/cat.webp`;
-      const imageTexture = textureLoader.load(src);
+      complex.traverse(child => {
+        if (child instanceof THREE.Mesh) {
+          meshes.push( child );
 
-      imageTexture.colorSpace = THREE.SRGBColorSpace; // 이미지 색감 표현을 위한 encoding 형태
-      screenMesh.material = new THREE.MeshStandardMaterial({ map: imageTexture, side: THREE.DoubleSide });
+          // setting screen
+          if ( screenMeshNames.indexOf(child.name) > -1 ) {
+            screenMeshes.push( child );
+          }
+
+        }
+      });
+
+      for (let i = 0; i < screenMeshes.length; i++) {
+        const screenMesh = screenMeshes[i];
+        const screenInfo = screenInfos.find(e => e.location == screenMesh.name);
+        // const src = isTablet ? screenInfo.imageMob : screenInfo.image;
+        const src = screenInfo.image;
+        const imageTexture = textureLoader.load(src);
+        imageTexture.colorSpace = THREE.SRGBColorSpace;
+        screenMesh.material = new THREE.MeshStandardMaterial({ map: imageTexture, side: THREE.DoubleSide });
+
+      }
       
       // animation
       mixer = new THREE.AnimationMixer(complex);
@@ -110,15 +169,20 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
       anim.duration = gltf.animations[0].duration - 0.0000000001;
       mixer.setTime(0);
 
-      // console.log(gltf.animations[0])// duration이 이상하게 나오는뎁숑
 
       //버튼클릭
-      const animDuration = anim.duration;
-      const animFrames = 250;
+      const mapTime = {
+        enter: 0, 
+        a: locationInfos.find(e => e.location == 'hall-a').time, 
+        b: locationInfos.find(e => e.location == 'hall-b').time, 
+        c: locationInfos.find(e => e.location == 'hall-c').time, 
+        exit: locationInfos.find(e => e.location == 'end').time 
+      };
     
       function mapBtnClick1(){
         const directionFrame = 25; // 목적지 애니메이션 프레임 -- 블렌더에서 확인 가능
         const directionTime = directionFrame / animFrames * animDuration; // 목적지 프레임에 대한 시간 값 계산
+        
         const directionProgress = directionTime / animDuration;
         const destinationTo = directionProgress * 10000; 
       
@@ -129,21 +193,29 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
         ease: 'Power1.easeInOut',
         duration: 1,
         onUpdate: function() {
-          // animator progress 계산
-          animator.progress = Math.max(0, Math.min(1, animator.time/10000));
-      
-          // 애니메이션 믹서를 (총 애니메이션 시간 * progress) 시간으로 보내서 애니메이션 이동
-          const aniTime = animator.progress * anim.duration;
-          mixer.setTime(aniTime);
-      
-          renderRequest();
+              // animator progress 계산
+              animator.progress = Math.max(0, Math.min(1, animator.time/10000));
+          
+              // 애니메이션 믹서를 (총 애니메이션 시간 * progress) 시간으로 보내서 애니메이션 이동
+              const aniTime = animator.progress * anim.duration;
+              mixer.setTime(aniTime);
+
+              $currentPointer.style.offsetDistance = '8%';
+              $popup.classList.remove('on');
+              for (a of $popInner){
+                a.classList.remove('on');
+              }
+              $popup.classList.add('on');
+              document.querySelector('.inner[data-pop="tutorial"]').classList.add('on');
+          
+              renderRequest();
             }
           });
         mixer.setTime(directionTime);
         renderRequest();
       }
       function mapBtnClick2(){
-        const directionFrame = 72; // 목적지 애니메이션 프레임 -- 블렌더에서 확인 가능
+        const directionFrame = 60; // 목적지 애니메이션 프레임 -- 블렌더에서 확인 가능
         const directionTime = directionFrame / animFrames * animDuration; // 목적지 프레임에 대한 시간 값 계산
         const directionProgress = directionTime / animDuration;
         const destinationTo = directionProgress * 10000; 
@@ -161,6 +233,14 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
           // 애니메이션 믹서를 (총 애니메이션 시간 * progress) 시간으로 보내서 애니메이션 이동
           const aniTime = animator.progress * anim.duration;
           mixer.setTime(aniTime);
+
+          $currentPointer.style.offsetDistance = '27%';
+          $popup.classList.remove('on');
+          for (a of $popInner){
+            a.classList.remove('on');
+          }          
+          $popup.classList.add('on');
+          document.querySelector('.inner[data-pop="hall-a"]').classList.add('on');
       
           renderRequest();
             }
@@ -169,7 +249,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
         renderRequest();
       }
       function mapBtnClick3(){
-        const directionFrame = 122; // 목적지 애니메이션 프레임 -- 블렌더에서 확인 가능
+        const directionFrame = 108; // 목적지 애니메이션 프레임 -- 블렌더에서 확인 가능
         const directionTime = directionFrame / animFrames * animDuration; // 목적지 프레임에 대한 시간 값 계산
         const directionProgress = directionTime / animDuration;
         const destinationTo = directionProgress * 10000; 
@@ -187,6 +267,14 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
           // 애니메이션 믹서를 (총 애니메이션 시간 * progress) 시간으로 보내서 애니메이션 이동
           const aniTime = animator.progress * anim.duration;
           mixer.setTime(aniTime);
+
+          $currentPointer.style.offsetDistance = '44%';
+          $popup.classList.remove('on');
+          for (a of $popInner){
+            a.classList.remove('on');
+          }          
+          $popup.classList.add('on');
+          document.querySelector('.inner[data-pop="hall-b"]').classList.add('on');
       
           renderRequest();
             }
@@ -213,6 +301,14 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
           // 애니메이션 믹서를 (총 애니메이션 시간 * progress) 시간으로 보내서 애니메이션 이동
           const aniTime = animator.progress * anim.duration;
           mixer.setTime(aniTime);
+
+          $currentPointer.style.offsetDistance = '72%';
+          $popup.classList.remove('on');
+          for (a of $popInner){
+            a.classList.remove('on');
+          }          
+          $popup.classList.add('on');
+          document.querySelector('.inner[data-pop="hall-c"]').classList.add('on');
       
           renderRequest();
             }
@@ -239,6 +335,15 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
           // 애니메이션 믹서를 (총 애니메이션 시간 * progress) 시간으로 보내서 애니메이션 이동
           const aniTime = animator.progress * anim.duration;
           mixer.setTime(aniTime);
+
+          $currentPointer.style.offsetDistance = '97%';
+
+          $popup.classList.remove('on');
+          for (a of $popInner){
+            a.classList.remove('on');
+          }          
+          $popup.classList.add('on');
+          document.querySelector('.inner[data-pop="end"]').classList.add('on');
       
           renderRequest();
             }
@@ -246,6 +351,9 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
         mixer.setTime(directionTime);
         renderRequest();
       }
+      
+      let a;
+      const $popInner  = document.querySelectorAll('.inner');
     
       document.querySelector('.btn[data-location="tutorial"]').addEventListener('click',function(){
         mapBtnClick1();
@@ -263,6 +371,32 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
         mapBtnClick5();
       });
 
+      //
+      document.querySelector('.inner[data-pop="tutorial"] .next').addEventListener('click',function(){
+        mapBtnClick2();
+      })
+      document.querySelector('.inner[data-pop="hall-a"] .prev').addEventListener('click',function(){
+        mapBtnClick1();
+      })
+      document.querySelector('.inner[data-pop="hall-a"] .next').addEventListener('click',function(){
+        mapBtnClick3();
+      })
+      document.querySelector('.inner[data-pop="hall-b"] .prev').addEventListener('click',function(){
+        mapBtnClick2();
+      })
+      document.querySelector('.inner[data-pop="hall-b"] .next').addEventListener('click',function(){
+        mapBtnClick4();
+      })
+      document.querySelector('.inner[data-pop="hall-c"] .prev').addEventListener('click',function(){
+        mapBtnClick3();
+      })
+      document.querySelector('.inner[data-pop="hall-c"] .next').addEventListener('click',function(){
+        mapBtnClick5();
+      })
+      document.querySelector('.inner[data-pop="end"] .prev').addEventListener('click',function(){
+        mapBtnClick4();
+      })
+
     
       scene.add(complex); //메쉬를 scene에 추가
 
@@ -273,7 +407,17 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
         // 로딩 중 에러가 발생한 경우의 콜백 함수
         console.error('모델 로딩 중 에러:', error);
     }
+    // (progress) => {
+    //   const loadingProgressBar = document.querySelector('.loading-progress_bar'); 
+    //   const loadProgress = Math.round(progress.loaded / progress.total * 100);
+    //   loadingProgressBar.style.width = `${loadProgress}%`;
+
+    //   if ( loadProgress === 100 ) {
+    //       document.querySelector('.content-loading').classList.remove('active');
+    //   }
+    // }
   );
+
 
 
 
@@ -298,20 +442,25 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
     const time = new Date().getTime();
     const distance = deltaY * 0.25;
 
+    if(deltaY < 0){
+      setTimeout(function(){
+        $currentPointer.style.transform = 'rotate(-270deg)';
+      },500)
+    }else{
+      setTimeout(function(){
+      $currentPointer.style.transform = 'rotate(-90deg)';
+      },500)
+    }
+
     if ( 
       (animator.progress < 0.999 ) ||
       (animator.progress > 0)
     ) {
       onAnimate(distance);
     }
-
-    // console.log(animator.progress)
-
   }
 
   //=========카메라 애니메이션=========
-  const popupTarget = { time: 0.5, elem: document.querySelector('.popup') }
-
   const onAnimate = function (distance) {
     const to = animator.to + distance;
   
@@ -325,53 +474,32 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
           animator.processing = true;
           animator.progress = Math.max(0, Math.min(1, animator.time/10000));
           const aniTime = animator.progress * anim.duration;
+          // console.log(animator.time, ' : animator.time', aniTime, ' : aniTime')
           mixer.setTime(aniTime);
+
+          $currentPointer.style.offsetDistance = aniTime / anim.duration * 100 + '%';
+
           
           if ( animator.progress == 1 ) animator.time = 10000;
           if ( animator.progress == 0 ) animator.time = 0;
 
-          // * 팝업 오픈
-          console.log(aniTime - popupTarget.time)
+          // ================ 팝업 오픈 ================
+            for (let i = 0; i < locationInfos.length; i++) {
+              if(aniTime < locationInfos[i].time[0] + 0.3 && aniTime > locationInfos[i].time[0] - 0.3){
+                if (!locationInfos[i].elem.classList.contains('on') ) {
+                  $popup.classList.add('on');
+                  $map.classList.remove('on');
+                  locationInfos[i].elem.classList.add('on');
 
-          // let popupOpen =  false;
-
-          if ( Math.abs(aniTime - popupTarget.time) > 0.5 && Math.abs(aniTime - popupTarget.time) < 0.7  ) { // 0.5은 임의로 설정한 gap
-            // popupOpen = true;
-            if (!popupTarget.elem.classList.contains('on') ) {
-              popupTarget.elem.classList.add('on');
-              // popupTarget.elem.style.opacity = aniTime / 0.2;
+                }
+              }else{
+                if(locationInfos[i].elem.classList.contains('on')){
+                  locationInfos[i].elem.classList.remove('on');
+                  $popup.classList.remove('on');
+                  $map.classList.add('on');
+                }
+              }
             }
-          }else if( Math.abs(aniTime - popupTarget.time) > 2.1 && Math.abs(aniTime - popupTarget.time) < 2.3  ) { // 0.5은 임의로 설정한 gap
-            // popupOpen = true;
-            if (!popupTarget.elem.classList.contains('on') ) {
-              popupTarget.elem.classList.add('on');
-              // popupTarget.elem.style.opacity = aniTime / 0.2;
-            }
-          }else if( Math.abs(aniTime - popupTarget.time) > 3.8 && Math.abs(aniTime - popupTarget.time) < 4.1  ) { // 0.5은 임의로 설정한 gap
-            // popupOpen = true;
-            if (!popupTarget.elem.classList.contains('on') ) {
-              popupTarget.elem.classList.add('on');
-              // popupTarget.elem.style.opacity = aniTime / 0.2;
-            }
-          }else if( Math.abs(aniTime - popupTarget.time) > 7.0 && Math.abs(aniTime - popupTarget.time) < 7.3  ) { // 0.5은 임의로 설정한 gap
-            // popupOpen = true;
-            if (!popupTarget.elem.classList.contains('on') ) {
-              popupTarget.elem.classList.add('on');
-              // popupTarget.elem.style.opacity = aniTime / 0.2;
-            }
-          }else if( Math.abs(aniTime - popupTarget.time) > 8.0 && Math.abs(aniTime - popupTarget.time) < 8.3  ) { // 0.5은 임의로 설정한 gap
-            // popupOpen = true;
-            if (!popupTarget.elem.classList.contains('on') ) {
-              popupTarget.elem.classList.add('on');
-              // popupTarget.elem.style.opacity = aniTime / 0.2;
-            }
-          }
-          else{
-            if (popupTarget.elem.classList.contains('on') ) {
-              popupTarget.elem.classList.remove('on');
-            }
-          }
-          // popupOpen = false;
   
           renderRequest();
         },
@@ -382,9 +510,15 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
     } 
   }
 
+  const domElem = renderer.domElement;
+  let targetTo = {processing: false, tween: null};
+  let controller = {processing: false, moved: false, x: 0, y: 0,};
+  let dragControl = {dragChk: false, direction: null, x: 0, y: 0, startX: 0, startY: 0};
+  let cameraBeforeEuler = new THREE.Euler(0, 0, 0, 'YXZ');
+  let cameraAfterEuler = new THREE.Euler(0, 0, 0, 'YXZ');
 
 	// 이벤트
-	window.addEventListener('resize', setSize);
-  canvas.addEventListener('wheel', onWheel, { passive: false });
+  window.addEventListener('resize', setSize);
+  window.addEventListener('wheel', onWheel, { passive: false });
 
   draw(); //로드 완료되면 실행시켜줘야하는 그리기 함수
