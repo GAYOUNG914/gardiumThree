@@ -598,6 +598,11 @@ THREE.DefaultLoadingManager.onProgress = function (url, itemsLoaded, itemsTotal)
     ) {
       onAnimate(distance);
     }
+
+    animator.to >= 0 ? onAnimate(distance) : animator.to == 0;
+    animator.to <= 10.41 ? onAnimate(distance) : animator.to == 10.41;
+    console.log( animator.to)
+
   }
 
   //=========카메라 애니메이션=========
