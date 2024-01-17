@@ -70,6 +70,7 @@ const locationInfos = [
 
 	// Scene
 	const scene = new THREE.Scene();
+  scene.fog = new THREE.Fog('white',5,30)
 
 	// Camera
   const fov = isMobile ? 100 : 70;
@@ -85,16 +86,6 @@ const locationInfos = [
 
   //Controls
   const controls = new OrbitControls(camera, renderer.domElement); //orbitControls는 파라미터 두 개를 받는다. camera와 돔엘리먼트
-
-  // Loading
-  // document.querySelector('.content-loading').classList.add('active');
-  THREE.DefaultLoadingManager.onProgress = function (url, itemsLoaded, itemsTotal) {
-      if (itemsLoaded === itemsTotal) {
-          // setEvent();
-          // setPopupEvent();
-          renderRequest();
-      }
-  };
 
   const screenMeshes = [];
   const screenMeshNames = 'avideo-1, avideo-2, cg-cut-1, cg-cut-2, cg-cut-3, cg-cut-4, cg-cut-5, cg-cut-6, cg-cut-7, cg-cut-8, cg-cut-9, cg-cut-10, unit-74, unit-84, unit-101, unit-124, unit-125, unit-138, end,  '.split(', ');
@@ -151,16 +142,28 @@ const locationInfos = [
         }
       });
 
-      for (let i = 0; i < screenMeshes.length; i++) {
-        const screenMesh = screenMeshes[i];
-        const screenInfo = screenInfos.find(e => e.location == screenMesh.name);
-        // const src = isTablet ? screenInfo.imageMob : screenInfo.image;
-        const src = screenInfo.image;
-        const imageTexture = textureLoader.load(src);
-        imageTexture.colorSpace = THREE.SRGBColorSpace;
-        screenMesh.material = new THREE.MeshStandardMaterial({ map: imageTexture, side: THREE.DoubleSide });
+        // Loading
+        // THREE.DefaultLoadingManager.onProgress = function (url, itemsLoaded, itemsTotal) {
+        //     if (itemsLoaded === itemsTotal) {
+        //         setScreens();
+        //         renderRequest();
+        //     }
+        // };
 
+      function setScreens(){
+        for (let i = 0; i < screenMeshes.length; i++) {
+          const screenMesh = screenMeshes[i];
+          const screenInfo = screenInfos.find(e => e.location == screenMesh.name);
+          // const src = isTablet ? screenInfo.imageMob : screenInfo.image;
+          const src = screenInfo.image;
+          const imageTexture = textureLoader.load(src);
+          imageTexture.colorSpace = THREE.SRGBColorSpace;
+          screenMesh.material = new THREE.MeshStandardMaterial({ map: imageTexture, side: THREE.DoubleSide });
+  
+        }
       }
+      setScreens();
+
       
       // animation
       mixer = new THREE.AnimationMixer(complex);
@@ -179,7 +182,7 @@ const locationInfos = [
         exit: locationInfos.find(e => e.location == 'end').time 
       };
     
-      function mapBtnClick1(){
+      function mapBtnClick1(e){
         const directionFrame = 25; // 목적지 애니메이션 프레임 -- 블렌더에서 확인 가능
         const directionTime = directionFrame / animFrames * animDuration; // 목적지 프레임에 대한 시간 값 계산
         
@@ -207,6 +210,8 @@ const locationInfos = [
               }
               $popup.classList.add('on');
               document.querySelector('.inner[data-pop="tutorial"]').classList.add('on');
+
+              $map.classList.remove('on');
           
               renderRequest();
             }
@@ -241,6 +246,8 @@ const locationInfos = [
           }          
           $popup.classList.add('on');
           document.querySelector('.inner[data-pop="hall-a"]').classList.add('on');
+
+          $map.classList.remove('on');
       
           renderRequest();
             }
@@ -275,6 +282,8 @@ const locationInfos = [
           }          
           $popup.classList.add('on');
           document.querySelector('.inner[data-pop="hall-b"]').classList.add('on');
+
+          $map.classList.remove('on');
       
           renderRequest();
             }
@@ -309,6 +318,8 @@ const locationInfos = [
           }          
           $popup.classList.add('on');
           document.querySelector('.inner[data-pop="hall-c"]').classList.add('on');
+
+          $map.classList.remove('on');
       
           renderRequest();
             }
@@ -344,6 +355,8 @@ const locationInfos = [
           }          
           $popup.classList.add('on');
           document.querySelector('.inner[data-pop="end"]').classList.add('on');
+
+          $map.classList.remove('on');
       
           renderRequest();
             }
@@ -351,12 +364,70 @@ const locationInfos = [
         mixer.setTime(directionTime);
         renderRequest();
       }
+
+      function rayCaster1(){
+        const directionFrame = 70; // 목적지 애니메이션 프레임 -- 블렌더에서 확인 가능
+        const directionTime = directionFrame / animFrames * animDuration; // 목적지 프레임에 대한 시간 값 계산
+        const directionProgress = directionTime / animDuration;
+        const destinationTo = directionProgress * 10000; 
+      
+        animator.to = destinationTo;
+        animator.tween && animator.tween.kill(); 
+        animator.tween = gsap.to(animator, {
+        time: animator.to,
+        ease: 'Power1.easeInOut',
+        duration: 1,
+        onUpdate: function() {
+          // animator progress 계산
+          animator.progress = Math.max(0, Math.min(1, animator.time/10000));
+      
+          // 애니메이션 믹서를 (총 애니메이션 시간 * progress) 시간으로 보내서 애니메이션 이동
+          const aniTime = animator.progress * anim.duration;
+          mixer.setTime(aniTime);
+
+          $currentPointer.style.offsetDistance = '28%';
+      
+          renderRequest();
+            }
+          });
+        mixer.setTime(directionTime);
+        renderRequest();        
+      }
+
+      function rayCaster2(){
+        const directionFrame = 90; // 목적지 애니메이션 프레임 -- 블렌더에서 확인 가능
+        const directionTime = directionFrame / animFrames * animDuration; // 목적지 프레임에 대한 시간 값 계산
+        const directionProgress = directionTime / animDuration;
+        const destinationTo = directionProgress * 10000; 
+      
+        animator.to = destinationTo;
+        animator.tween && animator.tween.kill(); 
+        animator.tween = gsap.to(animator, {
+        time: animator.to,
+        ease: 'Power1.easeInOut',
+        duration: 1,
+        onUpdate: function() {
+          // animator progress 계산
+          animator.progress = Math.max(0, Math.min(1, animator.time/10000));
+      
+          // 애니메이션 믹서를 (총 애니메이션 시간 * progress) 시간으로 보내서 애니메이션 이동
+          const aniTime = animator.progress * anim.duration;
+          mixer.setTime(aniTime);
+
+          $currentPointer.style.offsetDistance = '28%';
+      
+          renderRequest();
+            }
+          });
+        mixer.setTime(directionTime);
+        renderRequest();        
+      }
       
       let a;
       const $popInner  = document.querySelectorAll('.inner');
     
-      document.querySelector('.btn[data-location="tutorial"]').addEventListener('click',function(){
-        mapBtnClick1();
+      document.querySelector('.btn[data-location="tutorial"]').addEventListener('click',function(e){
+        mapBtnClick1(e);
       });
       document.querySelector('.btn[data-location="hall-a"]').addEventListener('click',function(){
         mapBtnClick2();
@@ -397,6 +468,72 @@ const locationInfos = [
         mapBtnClick4();
       })
 
+      //=========raycaster=========
+      let raycaster = new THREE.Raycaster();
+      let mouse = new THREE.Vector2();
+
+      function onMouseClick(event) {
+        // 마우스의 위치를 정규화(normalized)된 좌표로 변환
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+      
+        // Raycaster를 업데이트
+        raycaster.setFromCamera(mouse, camera);
+      
+        // 객체와의 교차 검사
+        let intersects = raycaster.intersectObjects(scene.children);
+      
+        // 교차된 객체에 대한 처리
+        if (intersects.length > 0) {
+          // intersects[0].object에서 교차된 객체에 대한 정보를 얻을 수 있음
+          // intersects[0].object.material.color.set(0xff0000);
+          // console.log(intersects[0].object.userData.name)
+          if(intersects[0].object.userData.name == 'avideo-1'){
+            rayCaster1();
+          }
+          if(intersects[0].object.userData.name == 'avideo-2'){
+            rayCaster2();
+          }
+        }
+      }
+
+      function onMouseMove(event){
+        // 마우스의 위치를 정규화(normalized)된 좌표로 변환
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+      
+        // Raycaster를 업데이트
+        raycaster.setFromCamera(mouse, camera);
+      
+        // 객체와의 교차 검사
+        let intersects = raycaster.intersectObjects(scene.children);
+      
+        // 교차된 객체에 대한 처리
+        if (intersects.length > 0) {
+
+          if(intersects[0].object.userData.name == 'avideo-1'){
+            intersects[0].object.material.color.set(0xff0000);
+            console.log('yes')
+
+          }else{
+            scene.children.forEach(obj => {
+              if (obj instanceof THREE.Mesh) {
+                // intersects[0].object.material.color.set(0x00ff00);
+                obj.material.color.set(0x00ff00);
+              }
+            });
+          }
+
+          // if(intersects[0].object.userData.name == 'avideo-2'){
+          //   rayCaster2();
+          // }
+          renderRequest();        
+        }        
+      }
+
+
+      document.addEventListener('click', onMouseClick, false);
+      // document.addEventListener('mousemove', onMouseMove, false);
     
       scene.add(complex); //메쉬를 scene에 추가
 
@@ -407,18 +544,21 @@ const locationInfos = [
         // 로딩 중 에러가 발생한 경우의 콜백 함수
         console.error('모델 로딩 중 에러:', error);
     }
-    // (progress) => {
-    //   const loadingProgressBar = document.querySelector('.loading-progress_bar'); 
-    //   const loadProgress = Math.round(progress.loaded / progress.total * 100);
-    //   loadingProgressBar.style.width = `${loadProgress}%`;
-
-    //   if ( loadProgress === 100 ) {
-    //       document.querySelector('.content-loading').classList.remove('active');
-    //   }
-    // }
   );
 
+// Loading
+document.querySelector('.content-loading').classList.add('active');
 
+THREE.DefaultLoadingManager.onProgress = function (url, itemsLoaded, itemsTotal) {
+  const loadingProgressBar = document.querySelector('.loading-progress_bar');
+  const loadProgress = Math.round(itemsLoaded / itemsTotal * 100);
+  // console.log(loadProgress)
+  loadingProgressBar.style.width = `${loadProgress}%`;
+
+  if ( loadProgress >= 100 ) {
+    document.querySelector('.content-loading').classList.remove('active');
+  }
+};
 
 
 	// 그리기
@@ -510,12 +650,17 @@ const locationInfos = [
     } 
   }
 
-  const domElem = renderer.domElement;
-  let targetTo = {processing: false, tween: null};
-  let controller = {processing: false, moved: false, x: 0, y: 0,};
-  let dragControl = {dragChk: false, direction: null, x: 0, y: 0, startX: 0, startY: 0};
-  let cameraBeforeEuler = new THREE.Euler(0, 0, 0, 'YXZ');
-  let cameraAfterEuler = new THREE.Euler(0, 0, 0, 'YXZ');
+
+
+  function animate() {
+    requestAnimationFrame(animate);
+  
+    // 큐브 회전 등 애니메이션 작업
+  
+    renderer.render(scene, camera);
+  }
+  
+  // animate();
 
 	// 이벤트
   window.addEventListener('resize', setSize);
