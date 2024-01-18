@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import dat from 'dat.gui';
 import gsap from 'gsap';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { Reflector } from 'three/addons/objects/Reflector.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 const $container = document.querySelector('.container')
@@ -25,7 +26,7 @@ const animDuration = 10.416666984458105;
 const $popup = document.querySelector('.popup');
 const locationInfos = [
   { location: 'tutorial',name: 'Section 01',elem: $container.querySelector('.popup .inner[data-pop="tutorial"]'), time: [25/animFrames  * animDuration], type: 'stop', isConfirm: false, },
-  { location: 'hall-a',  name: 'Section 02',elem: $container.querySelector('.popup .inner[data-pop="hall-a"]'), time: [60/animFrames * animDuration], type: 'stop', isConfirm: false, },
+  { location: 'hall-a',  name: 'Section 02',elem: $container.querySelector('.popup .inner[data-pop="hall-a"]'), time: [56/animFrames * animDuration], type: 'stop', isConfirm: false, },
   { location: 'hall-b',  name: 'Section 03',elem: $container.querySelector('.popup .inner[data-pop="hall-b"]'), time: [108/animFrames * animDuration], type: 'stop', isConfirm: false, },
   { location: 'hall-c',  name: 'Section 04',elem: $container.querySelector('.popup .inner[data-pop="hall-c"]'), time: [204/animFrames * animDuration], type: 'stop', isConfirm: false, },
   // { location: 'exit', name: 'Section 05',elem: $container.querySelector('.popup[data-pop="exit"]'),time: [1045/animFrames * animDuration],type: 'stop', isConfirm: false, },
@@ -60,6 +61,8 @@ const locationInfos = [
   
       isRequestRender = false;
     }
+
+
   
     window.requestAnimationFrame(draw);
   };
@@ -78,10 +81,44 @@ const locationInfos = [
 
 	scene.add(camera);
 
-
 	// Light
   const light = new THREE.AmbientLight('#fff', 2);
   scene.add(light);
+
+  //Sizing
+  // const time = 사이즈를 맞출 time
+  // const $fitElem = document.getElementById('sizing-camera-mesh-scale-wrap');
+  // const fitRect = $fitElem.getBoundingClientRect();
+  // const $meshArea = $fitElem.querySelector('.mesh-area');
+  // const meshRect = $meshArea.getBoundingClientRect();
+  // const mesh = screenInfos.find(e => e.location == 'avideo-1'); 
+  // const avideoSize = new THREE.Box3().setFromObject(mesh);
+  // const avideoHeight = avideoSize.max.y - avideoSize.min.y;
+  // // mesh와 카메라의 거리
+  // let cameraDistanceFromMesh = camera.position.distanceTo(avideo.position);
+  // // 여백 공간의 비율만큼 meshHeight을 곱함
+  // const targetHeight = avideoHeight * $fitElem.offsetHeight / $meshArea.offsetHeight;
+
+  // // mesh의 표면에 맞도록 mesh depth의 절반만큼을 거리에서 뺌
+  // cameraDistanceFromMesh -= (avideoSize.max.z - avideoSize.min.z) / 2;
+
+  // // fov 설정
+  // camera.fov = 2 * (180 / Math.PI) * Math.atan(targetHeight / (2 * cameraDistanceFromMesh));
+
+  // camera.setViewOffset(
+  //   fitRect.width, // 스크린 영역 넓이
+  //   fitRect.height, // 스크린 영역 높이
+  //   fitRect.width / 2 - meshRect.width / 2 - (meshRect.left - fitRect.left), // offset x
+  //   fitRect.height / 2 - meshRect.height / 2 - (meshRect.top - fitRect.top), // offset y
+  //   fitRect.width, // 스크린 영역 넓이
+  //   fitRect.height // 스크린 영역 높이
+  // );
+
+  // camera.updateProjectionMatrix();
+
+  
+
+
 
 
   //Controls
@@ -95,14 +132,14 @@ const locationInfos = [
     { location: 'avideo-2',  image: `${resourcesPath}pets2.webp`,    imageMob: `${resourcesPath}images/pets2.webp` },
     { location: 'cg-cut-1',  image: `${resourcesPath}cat3.webp`,  imageMob: `${resourcesPath}images/cat3.webp` },
     { location: 'cg-cut-2',  image: `${resourcesPath}hedgehog4.webp`,  imageMob: `${resourcesPath}hedgehog4.webp` },
-    { location: 'cg-cut-3',  image: `${resourcesPath}hedgehog4.webp`,  imageMob: `${resourcesPath}hedgehog4.webp` },
-    { location: 'cg-cut-4',  image: `${resourcesPath}hedgehog4.webp`,  imageMob: `${resourcesPath}hedgehog4.webp` },
-    { location: 'cg-cut-5',  image: `${resourcesPath}hedgehog4.webp`,  imageMob: `${resourcesPath}hedgehog4.webp` },
-    { location: 'cg-cut-6',  image: `${resourcesPath}hedgehog4.webp`,  imageMob: `${resourcesPath}hedgehog4.webp` },
+    { location: 'cg-cut-3',  image: `${resourcesPath}dog.webp`,  imageMob: `${resourcesPath}dog.webp` },
+    { location: 'cg-cut-4',  image: `${resourcesPath}fox-1.webp`,  imageMob: `${resourcesPath}fox-1.webp` },
+    { location: 'cg-cut-5',  image: `${resourcesPath}snow.webp`,  imageMob: `${resourcesPath}snow.webp` },
+    { location: 'cg-cut-6',  image: `${resourcesPath}cat-2.webp`,  imageMob: `${resourcesPath}cat-2.webp` },
     { location: 'cg-cut-7',  image: `${resourcesPath}fox5.webp`,  imageMob: `${resourcesPath}fox5.webp` },
-    { location: 'cg-cut-8',  image: `${resourcesPath}fox5.webp`,  imageMob: `${resourcesPath}fox5.webp` },
-    { location: 'cg-cut-9',  image: `${resourcesPath}fox5.webp`,  imageMob: `${resourcesPath}fox5.webp` },
-    { location: 'cg-cut-10', image: `${resourcesPath}fox5.webp`,  imageMob: `${resourcesPath}fox5.webp` },
+    { location: 'cg-cut-8',  image: `${resourcesPath}dog.webp`,  imageMob: `${resourcesPath}dog.webp` },
+    { location: 'cg-cut-9',  image: `${resourcesPath}fox-1.webp`,  imageMob: `${resourcesPath}fox-1.webp` },
+    { location: 'cg-cut-10', image: `${resourcesPath}snow.webp`,  imageMob: `${resourcesPath}snow.webp` },
     { location: 'unit-74',   image: `${resourcesPath}fox6.webp`, imageMob: `${resourcesPath}fox6.webp` },
     { location: 'unit-84',   image: `${resourcesPath}fox6.webp`, imageMob: `${resourcesPath}fox6.webp` },
     { location: 'unit-101',  image: `${resourcesPath}church.webp`,imageMob: `${resourcesPath}church.webp` },
@@ -111,6 +148,13 @@ const locationInfos = [
     { location: 'unit-138',  image: `${resourcesPath}church.webp`,imageMob: `${resourcesPath}church.webp` },
     { location: 'end',       image: `${resourcesPath}fox7.webp`,    imageMob: `${resourcesPath}fox7.webp` }
   ]
+
+  const reflectMeshes = { 
+    'a': { 'origin': null, 'plane': null, depthScale: 0.5, minDepthThreshold: 0.3, maxDepthThreshold: 1.0, reflexibility: 1.05, color: 0xc1cbcb, floorWidth: 12.3, floorHeight: 12.3, floorOpacity: 0.85, },
+    'c': { 'origin': null, 'plane': null, depthScale: 0.4, minDepthThreshold: 0.3, maxDepthThreshold: 1.0, reflexibility: 1.05, color: 0xc1cbcb, floorWidth: 12.3, floorHeight: 17.1, floorOpacity: 0.6, },
+  };
+
+  let obvrMesh;
 
   // gltf loader
   const gltfLoader = new GLTFLoader();
@@ -134,21 +178,61 @@ const locationInfos = [
         if (child instanceof THREE.Mesh) {
           meshes.push( child );
 
+          // console.log(obvrMesh)
+
           // setting screen
           if ( screenMeshNames.indexOf(child.name) > -1 ) {
             screenMeshes.push( child );
           }
 
+          console.log(child)
+
+          if ( child.name == 'object-vr-img' )      obvrMesh = child;
+          else if ( child.name == 'a-floor' )       reflectMeshes.a.origin = child;
+          else if ( child.name == 'a-floor_1' )     reflectMeshes.a.origin = child;
+          else if ( child.name == 'a-floor-plane' ) reflectMeshes.a.plane = child;
+          else if ( child.name == 'c-floor' )       reflectMeshes.c.origin = child;
+          else if ( child.name == 'c-floor-plane' ) reflectMeshes.c.plane = child;
         }
       });
 
-        // Loading
-        // THREE.DefaultLoadingManager.onProgress = function (url, itemsLoaded, itemsTotal) {
-        //     if (itemsLoaded === itemsTotal) {
-        //         setScreens();
-        //         renderRequest();
-        //     }
-        // };
+      reflectMeshes.a.mirror = setReflector(reflectMeshes.a);
+      reflectMeshes.c.mirror = setReflector(reflectMeshes.c);
+
+      function openani(){
+        const directionFrame = 25;
+        const directionTime = directionFrame / animFrames * animDuration; // 목적지 프레임에 대한 시간 값 계산
+        const directionProgress = directionTime / animDuration;
+        const destinationTo = directionProgress * 10000; 
+      
+        animator.to = destinationTo;
+        animator.tween && animator.tween.kill(); 
+        animator.tween = gsap.to(animator, {
+        time: animator.to,
+        ease: 'Power1.easeInOut',
+        duration: 2,
+        onUpdate: function() {
+          // animator progress 계산
+          animator.progress = Math.max(0, Math.min(1, animator.time/10000));
+      
+          // 애니메이션 믹서를 (총 애니메이션 시간 * progress) 시간으로 보내서 애니메이션 이동
+          const aniTime = animator.progress * anim.duration;
+          mixer.setTime(aniTime);
+  
+          $currentPointer.style.offsetDistance = '8%';
+          
+          // setTimeout( function(){
+          //   $popup.classList.add('on');
+          //   document.querySelector('.inner[data-pop="tutorial"]').classList.add('on');
+          //   $map.classList.remove('on');
+          // },500)
+      
+          renderRequest();
+            }
+          });
+      }
+      openani();
+
 
       function setScreens(){
         for (let i = 0; i < screenMeshes.length; i++) {
@@ -179,16 +263,60 @@ const locationInfos = [
         a: locationInfos.find(e => e.location == 'hall-a').time, 
         b: locationInfos.find(e => e.location == 'hall-b').time, 
         c: locationInfos.find(e => e.location == 'hall-c').time, 
-        exit: locationInfos.find(e => e.location == 'end').time 
+        end: locationInfos.find(e => e.location == 'end').time 
       };
-    
-      function mapBtnClick1(e){
-        const directionFrame = 25; // 목적지 애니메이션 프레임 -- 블렌더에서 확인 가능
+
+      //맵 버튼 클릭
+      function mapBtnClick(e){
+        let dataLocation = e.currentTarget.getAttribute('data-location');
+        let directionFrame, mapPointerPercentage,popupClass; // 목적지 애니메이션 프레임 -- 블렌더에서 확인 가능
+
+        if(e.currentTarget.classList.contains('prev') && e.currentTarget.parentNode.classList.contains('inner')){
+          let siblings = Array.from(e.currentTarget.parentNode.parentNode.children);
+          let index = siblings.indexOf(e.currentTarget.parentNode);
+
+          dataLocation = siblings[index - 1].getAttribute('data-pop');
+
+        }else if(e.currentTarget.classList.contains('next') && e.currentTarget.parentNode.classList.contains('inner')){
+          let siblings = Array.from(e.currentTarget.parentNode.parentNode.children);
+          let index = siblings.indexOf(e.currentTarget.parentNode);
+          
+          dataLocation = siblings[index + 1].getAttribute('data-pop');
+
+        }
+
+        switch (dataLocation){
+          case 'tutorial':
+            directionFrame = 25;
+            mapPointerPercentage = '8%';
+            popupClass = document.querySelector('.inner[data-pop="tutorial"]');
+            break;            
+          case 'hall-a':
+            directionFrame = 56;
+            mapPointerPercentage = '27%';
+            popupClass = document.querySelector('.inner[data-pop="hall-a"]');
+            break;            
+          case 'hall-b':
+            directionFrame = 108;
+            mapPointerPercentage = '44%';
+            popupClass = document.querySelector('.inner[data-pop="hall-b"]');
+            break;            
+          case 'hall-c':
+            directionFrame = 204;
+            mapPointerPercentage = '72%';
+            popupClass = document.querySelector('.inner[data-pop="hall-c"]');
+            break;  
+          case 'end':
+            directionFrame = 249;
+            mapPointerPercentage = '97%';
+            popupClass = document.querySelector('.inner[data-pop="end"]');
+            break;
+        }
+
         const directionTime = directionFrame / animFrames * animDuration; // 목적지 프레임에 대한 시간 값 계산
-        
         const directionProgress = directionTime / animDuration;
         const destinationTo = directionProgress * 10000; 
-      
+
         animator.to = destinationTo;
         animator.tween && animator.tween.kill(); 
         animator.tween = gsap.to(animator, {
@@ -203,270 +331,122 @@ const locationInfos = [
               const aniTime = animator.progress * anim.duration;
               mixer.setTime(aniTime);
 
-              $currentPointer.style.offsetDistance = '8%';
+              $currentPointer.style.offsetDistance = mapPointerPercentage;
               $popup.classList.remove('on');
               for (a of $popInner){
                 a.classList.remove('on');
               }
               $popup.classList.add('on');
-              document.querySelector('.inner[data-pop="tutorial"]').classList.add('on');
+              popupClass.classList.add('on');
 
               $map.classList.remove('on');
           
               renderRequest();
             }
           });
-        mixer.setTime(directionTime);
-        renderRequest();
-      }
-      function mapBtnClick2(){
-        const directionFrame = 60; // 목적지 애니메이션 프레임 -- 블렌더에서 확인 가능
-        const directionTime = directionFrame / animFrames * animDuration; // 목적지 프레임에 대한 시간 값 계산
-        const directionProgress = directionTime / animDuration;
-        const destinationTo = directionProgress * 10000; 
-      
-        animator.to = destinationTo;
-        animator.tween && animator.tween.kill(); 
-        animator.tween = gsap.to(animator, {
-        time: animator.to,
-        ease: 'Power1.easeInOut',
-        duration: 1,
-        onUpdate: function() {
-          // animator progress 계산
-          animator.progress = Math.max(0, Math.min(1, animator.time/10000));
-      
-          // 애니메이션 믹서를 (총 애니메이션 시간 * progress) 시간으로 보내서 애니메이션 이동
-          const aniTime = animator.progress * anim.duration;
-          mixer.setTime(aniTime);
-
-          $currentPointer.style.offsetDistance = '27%';
-          $popup.classList.remove('on');
-          for (a of $popInner){
-            a.classList.remove('on');
-          }          
-          $popup.classList.add('on');
-          document.querySelector('.inner[data-pop="hall-a"]').classList.add('on');
-
-          $map.classList.remove('on');
-      
-          renderRequest();
-            }
-          });
-        mixer.setTime(directionTime);
-        renderRequest();
-      }
-      function mapBtnClick3(){
-        const directionFrame = 108; // 목적지 애니메이션 프레임 -- 블렌더에서 확인 가능
-        const directionTime = directionFrame / animFrames * animDuration; // 목적지 프레임에 대한 시간 값 계산
-        const directionProgress = directionTime / animDuration;
-        const destinationTo = directionProgress * 10000; 
-      
-        animator.to = destinationTo;
-        animator.tween && animator.tween.kill(); 
-        animator.tween = gsap.to(animator, {
-        time: animator.to,
-        ease: 'Power1.easeInOut',
-        duration: 1,
-        onUpdate: function() {
-          // animator progress 계산
-          animator.progress = Math.max(0, Math.min(1, animator.time/10000));
-      
-          // 애니메이션 믹서를 (총 애니메이션 시간 * progress) 시간으로 보내서 애니메이션 이동
-          const aniTime = animator.progress * anim.duration;
-          mixer.setTime(aniTime);
-
-          $currentPointer.style.offsetDistance = '44%';
-          $popup.classList.remove('on');
-          for (a of $popInner){
-            a.classList.remove('on');
-          }          
-          $popup.classList.add('on');
-          document.querySelector('.inner[data-pop="hall-b"]').classList.add('on');
-
-          $map.classList.remove('on');
-      
-          renderRequest();
-            }
-          });
-        mixer.setTime(directionTime);
-        renderRequest();
-      }
-      function mapBtnClick4(){
-        const directionFrame = 204; // 목적지 애니메이션 프레임 -- 블렌더에서 확인 가능
-        const directionTime = directionFrame / animFrames * animDuration; // 목적지 프레임에 대한 시간 값 계산
-        const directionProgress = directionTime / animDuration;
-        const destinationTo = directionProgress * 10000; 
-      
-        animator.to = destinationTo;
-        animator.tween && animator.tween.kill(); 
-        animator.tween = gsap.to(animator, {
-        time: animator.to,
-        ease: 'Power1.easeInOut',
-        duration: 1,
-        onUpdate: function() {
-          // animator progress 계산
-          animator.progress = Math.max(0, Math.min(1, animator.time/10000));
-      
-          // 애니메이션 믹서를 (총 애니메이션 시간 * progress) 시간으로 보내서 애니메이션 이동
-          const aniTime = animator.progress * anim.duration;
-          mixer.setTime(aniTime);
-
-          $currentPointer.style.offsetDistance = '72%';
-          $popup.classList.remove('on');
-          for (a of $popInner){
-            a.classList.remove('on');
-          }          
-          $popup.classList.add('on');
-          document.querySelector('.inner[data-pop="hall-c"]').classList.add('on');
-
-          $map.classList.remove('on');
-      
-          renderRequest();
-            }
-          });
-        mixer.setTime(directionTime);
-        renderRequest();
-      }
-      function mapBtnClick5(){
-        const directionFrame = 250; // 목적지 애니메이션 프레임 -- 블렌더에서 확인 가능
-        const directionTime = directionFrame / animFrames * animDuration; // 목적지 프레임에 대한 시간 값 계산
-        const directionProgress = directionTime / animDuration;
-        const destinationTo = directionProgress * 10000; 
-      
-        animator.to = destinationTo;
-        animator.tween && animator.tween.kill(); 
-        animator.tween = gsap.to(animator, {
-        time: animator.to,
-        ease: 'Power1.easeInOut',
-        duration: 1,
-        onUpdate: function() {
-          // animator progress 계산
-          animator.progress = Math.max(0, Math.min(1, animator.time/10000));
-      
-          // 애니메이션 믹서를 (총 애니메이션 시간 * progress) 시간으로 보내서 애니메이션 이동
-          const aniTime = animator.progress * anim.duration;
-          mixer.setTime(aniTime);
-
-          $currentPointer.style.offsetDistance = '97%';
-
-          $popup.classList.remove('on');
-          for (a of $popInner){
-            a.classList.remove('on');
-          }          
-          $popup.classList.add('on');
-          document.querySelector('.inner[data-pop="end"]').classList.add('on');
-
-          $map.classList.remove('on');
-      
-          renderRequest();
-            }
-          });
-        mixer.setTime(directionTime);
-        renderRequest();
       }
 
-      function rayCaster1(){
-        const directionFrame = 70; // 목적지 애니메이션 프레임 -- 블렌더에서 확인 가능
-        const directionTime = directionFrame / animFrames * animDuration; // 목적지 프레임에 대한 시간 값 계산
-        const directionProgress = directionTime / animDuration;
-        const destinationTo = directionProgress * 10000; 
-      
-        animator.to = destinationTo;
-        animator.tween && animator.tween.kill(); 
-        animator.tween = gsap.to(animator, {
-        time: animator.to,
-        ease: 'Power1.easeInOut',
-        duration: 1,
-        onUpdate: function() {
-          // animator progress 계산
-          animator.progress = Math.max(0, Math.min(1, animator.time/10000));
-      
-          // 애니메이션 믹서를 (총 애니메이션 시간 * progress) 시간으로 보내서 애니메이션 이동
-          const aniTime = animator.progress * anim.duration;
-          mixer.setTime(aniTime);
+      //raycaster 펑션
+      function rayCaster(frameName){
+        let directionFrame,mapPointerPercentage; // 목적지 애니메이션 프레임 -- 블렌더에서 확인 가능        
 
-          $currentPointer.style.offsetDistance = '28%';
-      
-          renderRequest();
-            }
-          });
-        mixer.setTime(directionTime);
-        renderRequest();        
+        switch (frameName){
+          case 'avideo-1':
+            directionFrame = 70;
+            mapPointerPercentage = '28%';
+            break;            
+          case 'avideo-2':
+            directionFrame = 90;
+            mapPointerPercentage = '28%';
+            break;            
+          case 'cg-cut-1':
+             //중앙 맞추기
+            directionFrame = 118;
+            mapPointerPercentage = '44%';
+            break;            
+          case 'cg-cut-2':
+            directionFrame = 123;
+            mapPointerPercentage = '47%';
+            break;  
+          case 'cg-cut-3':
+            directionFrame = 127;
+            mapPointerPercentage = '47%';
+            break;
+          case 'cg-cut-4':
+            directionFrame = 130;
+            mapPointerPercentage = '47%';
+            break;
+          case 'cg-cut-5':
+            directionFrame = 133;
+            mapPointerPercentage = '47%';
+            break;
+          case 'cg-cut-6':
+            directionFrame = 139;
+            mapPointerPercentage = '48%';
+            break;
+          case 'cg-cut-7':
+            directionFrame = 157;
+            mapPointerPercentage = '50%';
+            break;    
+          case 'cg-cut-8':
+            directionFrame = 162;
+            mapPointerPercentage = '50%';
+            break;   
+          case 'cg-cut-9':
+             //중앙 맞추기
+            directionFrame = 166;
+            mapPointerPercentage = '51%';
+            break;   
+          case 'cg-cut-10':
+            directionFrame = 170;
+            mapPointerPercentage = '51%';
+            break;
+          default: 
+            return;
+        }
+
+          const directionTime = directionFrame / animFrames * animDuration; // 목적지 프레임에 대한 시간 값 계산
+          const directionProgress = directionTime / animDuration;
+          const destinationTo = directionProgress * 10000; 
+        
+          animator.to = destinationTo;
+          animator.tween && animator.tween.kill(); 
+          animator.tween = gsap.to(animator, {
+          time: animator.to,
+          ease: 'Power1.easeInOut',
+          duration: 1,
+          onUpdate: function() {
+            // animator progress 계산
+            animator.progress = Math.max(0, Math.min(1, animator.time/10000));
+        
+            // 애니메이션 믹서를 (총 애니메이션 시간 * progress) 시간으로 보내서 애니메이션 이동
+            const aniTime = animator.progress * anim.duration;
+            mixer.setTime(aniTime);
+  
+            $currentPointer.style.offsetDistance = mapPointerPercentage;
+        
+            renderRequest();
+              }
+            });
+
       }
 
-      function rayCaster2(){
-        const directionFrame = 90; // 목적지 애니메이션 프레임 -- 블렌더에서 확인 가능
-        const directionTime = directionFrame / animFrames * animDuration; // 목적지 프레임에 대한 시간 값 계산
-        const directionProgress = directionTime / animDuration;
-        const destinationTo = directionProgress * 10000; 
-      
-        animator.to = destinationTo;
-        animator.tween && animator.tween.kill(); 
-        animator.tween = gsap.to(animator, {
-        time: animator.to,
-        ease: 'Power1.easeInOut',
-        duration: 1,
-        onUpdate: function() {
-          // animator progress 계산
-          animator.progress = Math.max(0, Math.min(1, animator.time/10000));
-      
-          // 애니메이션 믹서를 (총 애니메이션 시간 * progress) 시간으로 보내서 애니메이션 이동
-          const aniTime = animator.progress * anim.duration;
-          mixer.setTime(aniTime);
-
-          $currentPointer.style.offsetDistance = '28%';
-      
-          renderRequest();
-            }
-          });
-        mixer.setTime(directionTime);
-        renderRequest();        
-      }
-      
-      let a;
+      let a,btnIndiv,popupBtn;
       const $popInner  = document.querySelectorAll('.inner');
-    
-      document.querySelector('.btn[data-location="tutorial"]').addEventListener('click',function(e){
-        mapBtnClick1(e);
-      });
-      document.querySelector('.btn[data-location="hall-a"]').addEventListener('click',function(){
-        mapBtnClick2();
-      });
-      document.querySelector('.btn[data-location="hall-b"]').addEventListener('click',function(){
-        mapBtnClick3();
-      });
-      document.querySelector('.btn[data-location="hall-c"]').addEventListener('click',function(){
-        mapBtnClick4();
-      });
-      document.querySelector('.btn[data-location="exit"]').addEventListener('click',function(){
-        mapBtnClick5();
-      });
 
-      //
-      document.querySelector('.inner[data-pop="tutorial"] .next').addEventListener('click',function(){
-        mapBtnClick2();
-      })
-      document.querySelector('.inner[data-pop="hall-a"] .prev').addEventListener('click',function(){
-        mapBtnClick1();
-      })
-      document.querySelector('.inner[data-pop="hall-a"] .next').addEventListener('click',function(){
-        mapBtnClick3();
-      })
-      document.querySelector('.inner[data-pop="hall-b"] .prev').addEventListener('click',function(){
-        mapBtnClick2();
-      })
-      document.querySelector('.inner[data-pop="hall-b"] .next').addEventListener('click',function(){
-        mapBtnClick4();
-      })
-      document.querySelector('.inner[data-pop="hall-c"] .prev').addEventListener('click',function(){
-        mapBtnClick3();
-      })
-      document.querySelector('.inner[data-pop="hall-c"] .next').addEventListener('click',function(){
-        mapBtnClick5();
-      })
-      document.querySelector('.inner[data-pop="end"] .prev').addEventListener('click',function(){
-        mapBtnClick4();
-      })
+      //=========맵 버튼 클릭=========
+      for(btnIndiv of document.querySelectorAll('.map-btns .btn')){
+        btnIndiv.addEventListener('click',function(e){
+          mapBtnClick(e);
+        })
+      }
+
+      //=========팝업 버튼 클릭=========
+      for(popupBtn of document.querySelectorAll('.popup .inner button')){
+        popupBtn.addEventListener('click',function(e){
+          mapBtnClick(e);
+        })
+      }
 
       //=========raycaster=========
       let raycaster = new THREE.Raycaster();
@@ -488,12 +468,12 @@ const locationInfos = [
           // intersects[0].object에서 교차된 객체에 대한 정보를 얻을 수 있음
           // intersects[0].object.material.color.set(0xff0000);
           // console.log(intersects[0].object.userData.name)
-          if(intersects[0].object.userData.name == 'avideo-1'){
-            rayCaster1();
+          let frameName = intersects[0].object.userData.name;
+
+          if(screenMeshNames.indexOf(frameName) > -1 ){
+            rayCaster(frameName);
           }
-          if(intersects[0].object.userData.name == 'avideo-2'){
-            rayCaster2();
-          }
+
         }
       }
 
@@ -507,30 +487,28 @@ const locationInfos = [
       
         // 객체와의 교차 검사
         let intersects = raycaster.intersectObjects(scene.children);
+        let frameName = intersects[0].object.userData.name;
       
         // 교차된 객체에 대한 처리
         if (intersects.length > 0) {
 
-          if(intersects[0].object.userData.name == 'avideo-1'){
-            intersects[0].object.material.color.set(0xff0000);
-            console.log('yes')
+          if(screenMeshNames.indexOf(frameName) > -1){
+            intersects[0].object.material.color.set(0xbbbbbb);
+            document.body.style.cursor = "pointer";
 
           }else{
             scene.children.forEach(obj => {
               if (obj instanceof THREE.Mesh) {
-                // intersects[0].object.material.color.set(0x00ff00);
+                intersects[0].object.material.color.set(0x00ff00);
                 obj.material.color.set(0x00ff00);
+                document.body.style.cursor = "auto";
               }
             });
           }
 
-          // if(intersects[0].object.userData.name == 'avideo-2'){
-          //   rayCaster2();
-          // }
           renderRequest();        
         }        
       }
-
 
       document.addEventListener('click', onMouseClick, false);
       // document.addEventListener('mousemove', onMouseMove, false);
@@ -555,10 +533,63 @@ THREE.DefaultLoadingManager.onProgress = function (url, itemsLoaded, itemsTotal)
   // console.log(loadProgress)
   loadingProgressBar.style.width = `${loadProgress}%`;
 
+
   if ( loadProgress >= 100 ) {
-    document.querySelector('.content-loading').classList.remove('active');
+    setTimeout(function(){
+      document.querySelector('.content-loading').classList.remove('active');
+      $popup.classList.add('on');
+      document.querySelector('.inner[data-pop="tutorial"]').classList.add('on');
+      $map.classList.remove('on');
+    },800)
   }
+
 };
+
+
+const setReflector = function (reflectMesheObj) {
+  const floor = reflectMesheObj.origin;
+  const floorPlane = reflectMesheObj.plane;
+  const mirror = new Reflector( new THREE.PlaneGeometry( reflectMesheObj.floorWidth, reflectMesheObj.floorHeight ), {
+    textureWidth: window.innerWidth * window.devicePixelRatio,
+    textureHeight: window.innerHeight * window.devicePixelRatio,
+    clipBias: 0,
+    color: reflectMesheObj.color,
+    depthScale: reflectMesheObj.depthScale,
+    minDepthThreshold: reflectMesheObj.minDepthThreshold,
+    maxDepthThreshold: reflectMesheObj.maxDepthThreshold,
+    reflexibility: reflectMesheObj.reflexibility
+  } );
+
+  console.log(floorPlane.position)
+
+  mirror.position.copy(floorPlane.position);
+  mirror.position.y += 0.001;
+  mirror.rotation.x = -Math.PI / 2;
+  scene.add( mirror );
+
+  const material = floor.material.clone();
+  material.transparent = true;
+  material.opacity = reflectMesheObj.floorOpacity;
+  material.depthWrite = false;
+  floor.material = material;
+  floor.position.y += 0.002;
+
+  floorPlane.material.transparent = true;
+  floorPlane.material.opacity = 0;
+
+
+  // if ( DEBUG ) {
+  //   // gui.add(mirror.material.uniforms.minDepthThreshold, 'value', 0, 1, 0.0001).name(`${(floor.name.split('-'))[0]}-minDepth`).onChange(renderRequest);
+  //   // gui.add(mirror.material.uniforms.maxDepthThreshold, 'value', 0, 2, 0.0001).name(`${(floor.name.split('-'))[0]}-maxDepth`).onChange(renderRequest);
+  //   // gui.add(mirror.material.uniforms.depthScale, 'value', 0, 2, 0.0001).name(`${(floor.name.split('-'))[0]}-depthS`).onChange(renderRequest);
+  //   // gui.add(mirror.material.uniforms.reflexibility, 'value', 0, 2).name(`${(floor.name.split('-'))[0]}-reflex`).onChange(renderRequest);
+  //   // gui.add(floor.material, 'opacity', 0, 1).name(`${(floor.name.split('-'))[0]}-opacity`).onChange(renderRequest);
+  //   // gui.add(floor.position, 'y', -10, 10, 0.01).name(`${(floor.name.split('-'))[0]}-y`).onChange(renderRequest);
+  // }
+
+  return { mirror }
+}
+
 
 
 	// 그리기
@@ -599,9 +630,9 @@ THREE.DefaultLoadingManager.onProgress = function (url, itemsLoaded, itemsTotal)
       onAnimate(distance);
     }
 
-    animator.to >= 0 ? onAnimate(distance) : animator.to == 0;
-    animator.to <= 10.41 ? onAnimate(distance) : animator.to == 10.41;
-    console.log( animator.to)
+    //공스크롤
+    animator.to >= 0 ? onAnimate(distance) : animator.to = 0;
+    animator.to <= 10000 ? onAnimate(distance) : animator.to = 10000;
 
   }
 
@@ -619,10 +650,19 @@ THREE.DefaultLoadingManager.onProgress = function (url, itemsLoaded, itemsTotal)
           animator.processing = true;
           animator.progress = Math.max(0, Math.min(1, animator.time/10000));
           const aniTime = animator.progress * anim.duration;
-          // console.log(animator.time, ' : animator.time', aniTime, ' : aniTime')
           mixer.setTime(aniTime);
 
           $currentPointer.style.offsetDistance = aniTime / anim.duration * 100 + '%';
+
+          if(animator.progress >= 0.3 && animator.progress <= 0.4){
+            $currentPointer.style.offsetDistance = '31%';
+          }
+          if(animator.progress >= 0.5 && animator.progress <= 0.7){
+            $currentPointer.style.offsetDistance = '54%';
+          }
+          if(animator.progress >= 0.8 && animator.progress <= 0.97){
+            $currentPointer.style.offsetDistance = '72%';
+          }
 
           
           if ( animator.progress == 1 ) animator.time = 10000;
@@ -654,18 +694,6 @@ THREE.DefaultLoadingManager.onProgress = function (url, itemsLoaded, itemsTotal)
       });
     } 
   }
-
-
-
-  function animate() {
-    requestAnimationFrame(animate);
-  
-    // 큐브 회전 등 애니메이션 작업
-  
-    renderer.render(scene, camera);
-  }
-  
-  // animate();
 
 	// 이벤트
   window.addEventListener('resize', setSize);

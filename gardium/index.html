@@ -4,24 +4,27 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>gardium complex gallary</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
   </head>
   <body>
     <div class="content-loading active">
       <div class="loading">
         <div class="loading-progress_bar"></div>
       </div>
-      <div class="load-text">.... loading .....</div>
+      <div class="load-text">LOADING</div>
     </div>
     <canvas id="three-canvas"></canvas>
     <div class="container">
-      <div class="map on">
+      <div class="map">
         <div class="map-inner">
           <div class="map-btns">
             <button type="button" class="btn" data-location="tutorial" data-action="to-tutorial">Entrance</button>
             <button type="button" class="btn" data-location="hall-a" data-action="to-hall-a">Hall A</button>
             <button type="button" class="btn" data-location="hall-b" data-action="to-hall-b">Hall B</button>
             <button type="button" class="btn" data-location="hall-c" data-action="to-hall-c">Hall C</button>
-            <button type="button" class="btn" data-location="exit" data-action="to-exit">Exit</button>
+            <button type="button" class="btn" data-location="end" data-action="to-end">Exit</button>
           </div>
           <span class="current-pointer"></span>
           <div class="map-img">
@@ -42,44 +45,52 @@
         <div class="popup-inner">
           <div class="inner" data-pop="tutorial">
             <div class="txt-wrap">
-              <h2 class="title">tutorial</h2>
-              <p class="desc">tutorial desc</p>
+              <h2 class="title">We are GREENPEACE</h2>
+              <p class="desc">We need to ACT NOW to <br>address the threats of climate change.</p>
             </div>
             <button class="next">next</button>
           </div>
           <div class="inner" data-pop="hall-a">
             <button class="prev">prev</button>
             <div class="txt-wrap">
-              <h2 class="title">hall-a</h2>
-              <p class="desc">hall-a desc</p>
+              <h2 class="title">Hall-A</h2>
+              <p class="desc">No New Fossil Fuels
+                </p>
             </div>
             <button class="next">next</button>
           </div>
           <div class="inner" data-pop="hall-b">
             <button class="prev">prev</button>
             <div class="txt-wrap">
-              <h2 class="title">hall-b title</h2>
-              <p class="desc">hall-b desc</p>
+              <h2 class="title">Hall-B</h2>
+              <p class="desc">Help Stop Deep Sea Mining <br>before it starts sign now
+                </p>
             </div>
             <button class="next">next</button>
           </div>
           <div class="inner" data-pop="hall-c">
             <button class="prev">prev</button>
             <div class="txt-wrap">
-              <h2 class="title">hall-c title</h2>
-              <p class="desc">hall-c desc</p>
+              <h2 class="title">Hall-C</h2>
+              <p class="desc">Stop Woodside's Dirty Gas
+                </p>
             </div>
             <button class="next">next</button>
           </div>
           <div class="inner" data-pop="end">
             <button class="prev">prev</button>
             <div class="txt-wrap">
-              <h2 class="title">end title</h2>
-              <p class="desc">end desc</p>
+              <h2 class="title">Time to take action</h2>
+              <p class="desc">Save the world</p>
             </div>
           </div>
         </div>
       </div>
+
+      <div id="sizing-camera-mesh-scale-wrap">
+        <div class="mesh-area avideo-1"></div>
+      </div>
+
     </div>
     <script type="module" src="./resources/js/main.js"></script>
   </body>
