@@ -25,6 +25,10 @@ const locationInfos = [
   { location: 'end',  name: '',  elem: $container.querySelector('.popup .inner[data-pop="end"]'), title:$container.querySelector('.title-inner[data-title="end"]'), time: [animDuration - 0.001],type: 'pass', isConfirm: false, size: null, fitElem: $container.querySelector('.popup[data-pop="end"] .contents-end'), fitRect: null, },
 ];
 
+const sizingInfos = [
+  { location: 'avideo-1',name: 'avideo-1',elem: $container.querySelector('#sizing-camera-mesh-scale-wrap'), time: [70/animFrames  * animDuration], type: 'stop', isConfirm: false, },
+]
+
 const screenMeshes = [];
 const screenMeshNames = 'avideo-1, avideo-2, cg-cut-1, cg-cut-2, cg-cut-3, cg-cut-4, cg-cut-5, cg-cut-6, cg-cut-7, cg-cut-8, cg-cut-9, cg-cut-10, unit-74, unit-84, unit-101, unit-124, unit-125, unit-138, end,  '.split(', ');
 const resourcesPath = 'resources/images/';
@@ -118,6 +122,39 @@ const reflectMeshes = {
           else if ( child.name == 'c-floor' )       reflectMeshes.c.origin = child;
           else if ( child.name == 'c-floor-plane' ) reflectMeshes.c.plane = child;
         }
+
+        function sizingOn(){
+          if ( child.name == 'avideo-1' ) {
+            let mesh = child; 
+            const size = new THREE.Box3().setFromObject(mesh);
+            const meshHeight = size.max.y - size.min.y;
+            let cameraDistanceFromMesh = camera.position.distanceTo(mesh.position);
+  
+            const $wrap = document.getElementById('sizing-camera-mesh-scale-wrap');
+            const $meshArea = $wrap.querySelector('.mesh-area');
+            const areaRect = $wrap.getBoundingClientRect();
+            const meshRect = $meshArea.getBoundingClientRect();
+            // const scale = $meshArea.offsetHeight / $wrap.offsetHeight;
+            // mesh.scale.set(scale, scale, scale);
+            const targetHeight = meshHeight * $wrap.offsetHeight / $meshArea.offsetHeight
+    
+            cameraDistanceFromMesh -= (size.max.z - size.min.z) / 2;
+  
+            // camera.fov = 2 * (180 / Math.PI) * Math.atan(meshHeight / (2 * cameraDistanceFromMesh));
+            camera.fov = 2 * (180 / Math.PI) * Math.atan(targetHeight / (2 * cameraDistanceFromMesh));
+  
+            // offset 설정
+            camera.setViewOffset(
+              areaRect.width, // 스크린 영역 넓이
+              areaRect.height, // 스크린 영역 높이
+              areaRect.width / 2 - meshRect.width / 2 - (meshRect.left - areaRect.left), // offset x
+              areaRect.height / 2 - meshRect.height / 2 - (meshRect.top - areaRect.top), // offset y
+              areaRect.width, // 스크린 영역 넓이
+              areaRect.height // 스크린 영역 높이
+            );     
+          }
+        }
+
       });
       let raycaster = new THREE.Raycaster();
       let mouse = new THREE.Vector2();
@@ -588,6 +625,23 @@ const reflectMeshes = {
                   $popup.classList.remove('on');
                   $map.classList.add('on');
                 }
+              }
+            }
+
+          // ================ 사이징 팝업 오픈 ================
+            if(aniTime < sizingInfos[0].time[0] + 0.1 && aniTime > sizingInfos[0].time[0] - 0.1){
+              if (!sizingInfos[0].elem.classList.contains('on') ) {
+
+                $map.classList.remove('on');
+                sizingInfos[0].elem.classList.add('on');
+                sizingOn();
+
+              }
+            }else{
+              if(sizingInfos[0].elem.classList.contains('on')){
+                sizingInfos[0].elem.classList.remove('on');
+                $map.classList.add('on');
+
               }
             }
   

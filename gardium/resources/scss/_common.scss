@@ -314,8 +314,12 @@ body * {
 
 #sizing-camera-mesh-scale-wrap{
   position: absolute;
-  background: red;
+  border: 2px solid red;
   z-index: 999;
+  display: none;
+  &.on{
+    display: block;
+  }
   .mesh-area{
     position: absolute;
     z-index: 999;
