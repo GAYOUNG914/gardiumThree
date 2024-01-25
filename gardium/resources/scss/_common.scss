@@ -72,6 +72,34 @@ body * {
   word-break: keep-all;
 }
 
+.scene-title{
+  position: absolute;
+  top: 41%;
+  left: 51%;
+  transform: translateX(-50%);
+  .title-inner{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top:0;
+    left: 0;
+    width: 100%;
+    // &[data-title="hall-a"]{
+    //   transform: translateY(-150%);
+    // }
+  }
+  .letter{
+    display: block;
+    opacity: 0;
+    font-size: 120px;
+    text-shadow: 5px 5px 5px rgba(0,0,0,.2);
+    color: rgba(0,0,0,.4);
+    font-weight: 500;
+    letter-spacing: -1.5px;
+  }
+}
+
 .popup{
   // display: none;
   visibility: hidden;
