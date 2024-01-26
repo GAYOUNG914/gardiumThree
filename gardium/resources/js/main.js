@@ -13,6 +13,7 @@ const $popInner  = document.querySelectorAll('.inner');
 let isMobile = Mobile();
 let isRequestRender;
 let a,btnIndiv,popupBtn;
+let startFov, startView;
 
 const animFrames = 250;
 const animDuration = 10.416666984458105;
@@ -26,7 +27,7 @@ const locationInfos = [
 ];
 
 const sizingInfos = [
-  { location: 'avideo-1',name: 'avideo-1',elem: $container.querySelector('#sizing-camera-mesh-scale-wrap'), time: [70/animFrames  * animDuration], type: 'stop', isConfirm: false, },
+  { location: 'avideo-1',name: 'avideo-1',elem: $container.querySelector('#sizing-camera-mesh-scale-wrap'), time: [70/animFrames  * animDuration, 90/animFrames  * animDuration], type: 'pass', isConfirm: false, size: null, fitElem: $container.querySelector('.avideo-1'), fitRect: null, },
 ]
 
 const screenMeshes = [];
@@ -123,38 +124,6 @@ const reflectMeshes = {
           else if ( child.name == 'c-floor-plane' ) reflectMeshes.c.plane = child;
         }
 
-        function sizingOn(){
-          if ( child.name == 'avideo-1' ) {
-            let mesh = child; 
-            const size = new THREE.Box3().setFromObject(mesh);
-            const meshHeight = size.max.y - size.min.y;
-            let cameraDistanceFromMesh = camera.position.distanceTo(mesh.position);
-  
-            const $wrap = document.getElementById('sizing-camera-mesh-scale-wrap');
-            const $meshArea = $wrap.querySelector('.mesh-area');
-            const areaRect = $wrap.getBoundingClientRect();
-            const meshRect = $meshArea.getBoundingClientRect();
-            // const scale = $meshArea.offsetHeight / $wrap.offsetHeight;
-            // mesh.scale.set(scale, scale, scale);
-            const targetHeight = meshHeight * $wrap.offsetHeight / $meshArea.offsetHeight
-    
-            cameraDistanceFromMesh -= (size.max.z - size.min.z) / 2;
-  
-            // camera.fov = 2 * (180 / Math.PI) * Math.atan(meshHeight / (2 * cameraDistanceFromMesh));
-            camera.fov = 2 * (180 / Math.PI) * Math.atan(targetHeight / (2 * cameraDistanceFromMesh));
-  
-            // offset 설정
-            camera.setViewOffset(
-              areaRect.width, // 스크린 영역 넓이
-              areaRect.height, // 스크린 영역 높이
-              areaRect.width / 2 - meshRect.width / 2 - (meshRect.left - areaRect.left), // offset x
-              areaRect.height / 2 - meshRect.height / 2 - (meshRect.top - areaRect.top), // offset y
-              areaRect.width, // 스크린 영역 넓이
-              areaRect.height // 스크린 영역 높이
-            );     
-          }
-        }
-
       });
       let raycaster = new THREE.Raycaster();
       let mouse = new THREE.Vector2();
@@ -186,6 +155,7 @@ const reflectMeshes = {
           // 애니메이션 믹서를 (총 애니메이션 시간 * progress) 시간으로 보내서 애니메이션 이동
           const aniTime = animator.progress * anim.duration;
           mixer.setTime(aniTime);
+          // changeSizing(sizingInfo, aniTime, startView);
     
           $currentPointer.style.offsetDistance = '8%';
     
@@ -423,6 +393,8 @@ const reflectMeshes = {
       scene.add(complex);
 
       renderRequest();
+      resizeScreen();
+
 
       for(btnIndiv of document.querySelectorAll('.map-btns .btn')){
         btnIndiv.addEventListener('click',function(e){
@@ -442,6 +414,137 @@ const reflectMeshes = {
         console.error('모델 로딩 중 에러:', error);
     }
   );
+
+  let fovs,viewX,viewY;
+  function resizeScreen(){
+    // const fitHeihgtRatio = (areaHeight - footerHeight*2) / areaHeight;
+    const sizingValues = { fitFov: fovs, viewX: viewX, viewY: viewY };
+    const currentTime = mixer.time;
+
+
+    // * startFov, startView 는 휠 gsap, 특정 영역으로 이동하는 gsap가 시작할때, 끝났을 때 한번씩 업데이트
+    if( startFov == null ) startFov = camera.fov;
+    if( startView == null ) startView = camera.view;
+
+    // sizing 값 설정
+    meshes.forEach((mesh)=>{
+
+    const sizingInfo = sizingInfos.find(e => e.location === mesh.name);
+    const $screen = $container.querySelector('.avideo-1');
+    
+    // console.log(sizingInfo)
+
+      if (screenMeshNames.indexOf(mesh.name) > -1) {
+        if ( mesh.name == 'avideo-1' ) {
+          // setting min-height 이건 뭔지 모르겠음
+          sizingInfo.fitRect = $screen.getBoundingClientRect();
+
+          // setting sizing
+          const size = new THREE.Box3().setFromObject(mesh);
+          sizingInfo.size = size;
+          const meshHeight = size.max.y - size.min.y;
+          const meshDepth = size.max.z - size.min.z;
+
+          mixer.setTime(sizingInfo.time[0]);
+          camera.position.copy(sceneCamera.position);
+          camera.rotation.copy(sceneCamera.rotation);
+    
+          let cameraDistanceFromMesh = camera.position.distanceTo(mesh.position);
+          const $wrap = document.getElementById('sizing-camera-mesh-scale-wrap');
+          const $meshArea = $wrap.querySelector('.avideo-1');
+          const areaRect = $wrap.getBoundingClientRect();
+          const meshRect = $meshArea.getBoundingClientRect();
+          const targetHeight = meshHeight * $wrap.offsetHeight / $meshArea.offsetHeight;
+    
+          // cameraDistanceFromMesh -= (size.max.z - size.min.z) / 2;
+          camera.fov = 2 * (180 / Math.PI) * Math.atan(targetHeight / (2 * cameraDistanceFromMesh));
+
+          const fitRect = sizingInfo.fitRect;
+
+          const viewX = $wrap.width/2 - fitRect.width/2 - (fitRect.left - $wrap.left);
+          const viewY = $wrap.height/2 - fitRect.height/2 - (fitRect.top - $wrap.top);
+
+          sizingValues.fitFov = camera.fov;
+          sizingValues.viewX = viewX;
+          sizingValues.viewY = viewY;
+
+          // 애니메이션 타임 다시 초기화
+          mixer.setTime(currentTime);
+    
+          // offset 설정
+          // camera.setViewOffset(
+          //   areaRect.width, // 스크린 영역 넓이
+          //   areaRect.height, // 스크린 영역 높이
+          //   areaRect.width / 2 - meshRect.width / 2 - (meshRect.left - areaRect.left), // offset x
+          //   areaRect.height / 2 - meshRect.height / 2 - (meshRect.top - areaRect.top), // offset y
+          //   areaRect.width, // 스크린 영역 넓이
+          //   areaRect.height // 스크린 영역 높이
+          // );     
+          changeSizing(sizingInfo, currentTime, startView);
+        }
+      }
+    })
+  }
+
+  const changeSizing = function (sizingInfo, aniTime, startView) {
+
+    const targetTime = sizingInfo.time;
+    const targetFov = sizingInfo.fitFov;
+    const viewX = sizingInfo.viewX;
+    const viewY = sizingInfo.viewY;
+  
+    // 사이징을 맞출 시간을 지정하고 앞뒤로 0.5의 범위를 설정 
+    // -> 콘솔에 찍어보면서 fitFov, fitView 맞는지 확인
+    if ( 
+      targetTime.length > 1 ? 
+        Math.abs(aniTime - targetTime[0]) < 0.5 || Math.abs(aniTime - targetTime[1]) < 0.5 :
+        Math.abs(aniTime - targetTime[0]) < 0.5 
+    ) {
+      const gap = startFov - targetFov;
+      const time = targetTime.length > 1 ? 
+        [Math.abs(aniTime - targetTime[0]) * 2, Math.abs(aniTime - targetTime[1]) * 2] : 
+        [Math.abs(aniTime - targetTime[0]) * 2];
+      
+      let progress;
+      if ( time.length == 1 ) {
+        progress = Math.max(0, Math.min(1, 1 - time[0]));
+      } else {
+        progress = 
+          aniTime < targetTime[0] ? Math.max(0, Math.min(1, 1 - time[0])) : 
+          aniTime > targetTime[1] ? Math.max(0, Math.min(1, 1 - time[1])) : 1
+      };
+      startView = aniTime > targetTime[1] ? { offsetX: 0, offsetY: 0 } : startView;
+
+      onSizing( viewX, viewY, gap, progress, startFov, startView);
+
+      if ( aniTime > targetTime[0] && aniTime < targetTime[1] && Math.abs(camera.fov - targetFov) > .3 ) {
+        camera.fov = targetFov;
+      }
+    }
+  }
+
+  const onSizing = function (viewX, viewY, gap, progress, startFov, startView) {
+  // const onSizing = function (viewX, viewY, startFov, startView, areaRect, meshRect) {
+    // 기본 값 설정
+    startFov = startFov ? startFov : 60;
+    startView = startView ? startView : { offsetX: 0, offsetY: 0 };
+
+    const $wrap = document.getElementById('sizing-camera-mesh-scale-wrap');
+    const areaRect = $wrap.getBoundingClientRect();
+
+    camera.fov = startFov - gap*(progress);
+    camera.setViewOffset(
+      areaRect.width, 
+      areaRect.height,
+      startView.offsetX + (viewX - startView.offsetX) * progress,
+      startView.offsetY + (viewY - startView.offsetY) * progress,
+      areaRect.width,
+      areaRect.height
+    );
+  
+    camera.updateProjectionMatrix();
+    renderRequest();
+  }
 
   //=========Loading=========
   document.querySelector('.content-loading').classList.add('active');
@@ -606,6 +709,11 @@ const reflectMeshes = {
           if ( animator.progress == 1 ) animator.time = 10000;
           if ( animator.progress == 0 ) animator.time = 0;
 
+          for (let i = 0; i < sizingInfos.length; i++) {
+            const sizingInfo = sizingInfos[i];
+            changeSizing(sizingInfo, aniTime, startView);
+          }
+
           // ================ 팝업 오픈 ================
           let animationExecuted = false;
 
@@ -629,21 +737,21 @@ const reflectMeshes = {
             }
 
           // ================ 사이징 팝업 오픈 ================
-            if(aniTime < sizingInfos[0].time[0] + 0.1 && aniTime > sizingInfos[0].time[0] - 0.1){
-              if (!sizingInfos[0].elem.classList.contains('on') ) {
+            // if(aniTime < sizingInfos[0].time[0] + 0.1 && aniTime > sizingInfos[0].time[0] - 0.1){
+            //   if (!sizingInfos[0].elem.classList.contains('on') ) {
 
-                $map.classList.remove('on');
-                sizingInfos[0].elem.classList.add('on');
-                sizingOn();
+            //     $map.classList.remove('on');
+            //     sizingInfos[0].elem.classList.add('on');
+            //     resizeScreen();
 
-              }
-            }else{
-              if(sizingInfos[0].elem.classList.contains('on')){
-                sizingInfos[0].elem.classList.remove('on');
-                $map.classList.add('on');
+            //   }
+            // }else{
+            //   if(sizingInfos[0].elem.classList.contains('on')){
+            //     sizingInfos[0].elem.classList.remove('on');
+            //     $map.classList.add('on');
 
-              }
-            }
+            //   }
+            // }
   
           renderRequest();
         },
