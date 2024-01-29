@@ -9,7 +9,9 @@ const canvas = document.querySelector('#three-canvas');
 const $currentPointer = document.querySelector('.current-pointer');
 const $map = document.querySelector('.map');
 const $popInner  = document.querySelectorAll('.inner');
-
+const $wrap = document.getElementById('sizing-camera-mesh-scale-wrap');
+let wrapRect;
+wrapRect = $wrap.getBoundingClientRect();
 let isMobile = Mobile();
 let isRequestRender;
 let a,btnIndiv,popupBtn;
@@ -27,7 +29,7 @@ const locationInfos = [
 ];
 
 const sizingInfos = [
-  { location: 'avideo-1',name: 'avideo-1',elem: $container.querySelector('#sizing-camera-mesh-scale-wrap'), time: [70/animFrames  * animDuration, 90/animFrames  * animDuration], type: 'pass', isConfirm: false, size: null, fitElem: $container.querySelector('.avideo-1'), fitRect: null, },
+  { location: 'avideo-1',name: 'avideo-1',elem: $container.querySelector('#sizing-camera-mesh-scale-wrap'), time: [70/animFrames  * animDuration, 90/animFrames  * animDuration], type: 'pass', isConfirm: false, size: null, fitElem: document.querySelector('.avideo-1'), fitRect: null,},
 ]
 
 const screenMeshes = [];
@@ -124,6 +126,8 @@ const reflectMeshes = {
           else if ( child.name == 'c-floor-plane' ) reflectMeshes.c.plane = child;
         }
 
+          // changeSizing(sizingInfo, aniTime, startView);
+
       });
       let raycaster = new THREE.Raycaster();
       let mouse = new THREE.Vector2();
@@ -155,7 +159,6 @@ const reflectMeshes = {
           // 애니메이션 믹서를 (총 애니메이션 시간 * progress) 시간으로 보내서 애니메이션 이동
           const aniTime = animator.progress * anim.duration;
           mixer.setTime(aniTime);
-          // changeSizing(sizingInfo, aniTime, startView);
     
           $currentPointer.style.offsetDistance = '8%';
     
@@ -418,9 +421,8 @@ const reflectMeshes = {
   let fovs,viewX,viewY;
   function resizeScreen(){
     // const fitHeihgtRatio = (areaHeight - footerHeight*2) / areaHeight;
-    const sizingValues = { fitFov: fovs, viewX: viewX, viewY: viewY };
+    // const sizingValues = { fitFov: fovs, viewX: viewX, viewY: viewY };
     const currentTime = mixer.time;
-
 
     // * startFov, startView 는 휠 gsap, 특정 영역으로 이동하는 gsap가 시작할때, 끝났을 때 한번씩 업데이트
     if( startFov == null ) startFov = camera.fov;
@@ -429,10 +431,11 @@ const reflectMeshes = {
     // sizing 값 설정
     meshes.forEach((mesh)=>{
 
+    // console.log(document.querySelector('.avideo-1').offsetHeight, 'resizeee')
+
     const sizingInfo = sizingInfos.find(e => e.location === mesh.name);
     const $screen = $container.querySelector('.avideo-1');
     
-    // console.log(sizingInfo)
 
       if (screenMeshNames.indexOf(mesh.name) > -1) {
         if ( mesh.name == 'avideo-1' ) {
@@ -442,44 +445,30 @@ const reflectMeshes = {
           // setting sizing
           const size = new THREE.Box3().setFromObject(mesh);
           sizingInfo.size = size;
-          const meshHeight = size.max.y - size.min.y;
-          const meshDepth = size.max.z - size.min.z;
+          sizingInfo.sizeHeight = size.max.y - size.min.y;
+          sizingInfo.sizeDepth = size.max.z - size.min.z;
 
           mixer.setTime(sizingInfo.time[0]);
           camera.position.copy(sceneCamera.position);
           camera.rotation.copy(sceneCamera.rotation);
     
-          let cameraDistanceFromMesh = camera.position.distanceTo(mesh.position);
-          const $wrap = document.getElementById('sizing-camera-mesh-scale-wrap');
-          const $meshArea = $wrap.querySelector('.avideo-1');
-          const areaRect = $wrap.getBoundingClientRect();
-          const meshRect = $meshArea.getBoundingClientRect();
-          const targetHeight = meshHeight * $wrap.offsetHeight / $meshArea.offsetHeight;
-    
-          // cameraDistanceFromMesh -= (size.max.z - size.min.z) / 2;
-          camera.fov = 2 * (180 / Math.PI) * Math.atan(targetHeight / (2 * cameraDistanceFromMesh));
+          const cameraDistanceFromMesh = camera.position.distanceTo(mesh.position);
 
+          // console.log(sizingInfo.sizeHeight, wrapRect.height, sizingInfo.fitElem.offsetHeight)
+          const targetHeight = sizingInfo.sizeHeight * wrapRect.height / sizingInfo.fitElem.offsetHeight;
+          const fovs = 2 * (180 / Math.PI) * Math.atan(targetHeight / (2 * cameraDistanceFromMesh));
           const fitRect = sizingInfo.fitRect;
 
-          const viewX = $wrap.width/2 - fitRect.width/2 - (fitRect.left - $wrap.left);
-          const viewY = $wrap.height/2 - fitRect.height/2 - (fitRect.top - $wrap.top);
+          const viewX = wrapRect.width/2 - fitRect.width/2 - (fitRect.left - wrapRect.left);
+          const viewY = wrapRect.height/2 - fitRect.height/2 - (fitRect.top - wrapRect.top);
 
-          sizingValues.fitFov = camera.fov;
-          sizingValues.viewX = viewX;
-          sizingValues.viewY = viewY;
-
+          sizingInfo.fitFov = fovs;
+          sizingInfo.viewX = viewX;
+          sizingInfo.viewY = viewY;
+          // console.log(sizingInfo.viewX, sizingInfo.viewY)
           // 애니메이션 타임 다시 초기화
           mixer.setTime(currentTime);
-    
-          // offset 설정
-          // camera.setViewOffset(
-          //   areaRect.width, // 스크린 영역 넓이
-          //   areaRect.height, // 스크린 영역 높이
-          //   areaRect.width / 2 - meshRect.width / 2 - (meshRect.left - areaRect.left), // offset x
-          //   areaRect.height / 2 - meshRect.height / 2 - (meshRect.top - areaRect.top), // offset y
-          //   areaRect.width, // 스크린 영역 넓이
-          //   areaRect.height // 스크린 영역 높이
-          // );     
+   
           changeSizing(sizingInfo, currentTime, startView);
         }
       }
@@ -488,17 +477,18 @@ const reflectMeshes = {
 
   const changeSizing = function (sizingInfo, aniTime, startView) {
 
+    if ( screenMeshNames.indexOf(sizingInfo.location) == -1 ) return;
+    if ( !sizingInfo.fitElem ) return;
+
     const targetTime = sizingInfo.time;
     const targetFov = sizingInfo.fitFov;
     const viewX = sizingInfo.viewX;
     const viewY = sizingInfo.viewY;
   
-    // 사이징을 맞출 시간을 지정하고 앞뒤로 0.5의 범위를 설정 
-    // -> 콘솔에 찍어보면서 fitFov, fitView 맞는지 확인
     if ( 
       targetTime.length > 1 ? 
-        Math.abs(aniTime - targetTime[0]) < 0.5 || Math.abs(aniTime - targetTime[1]) < 0.5 :
-        Math.abs(aniTime - targetTime[0]) < 0.5 
+        Math.abs(aniTime - targetTime[0]) < 0.2 || Math.abs(aniTime - targetTime[1]) < 0.2 :
+        Math.abs(aniTime - targetTime[0]) < 0.2 
     ) {
       const gap = startFov - targetFov;
       const time = targetTime.length > 1 ? 
@@ -642,8 +632,10 @@ const reflectMeshes = {
 		camera.updateProjectionMatrix();
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		renderer.draw(scene, camera);
+
+    wrapRect = $wrap.getBoundingClientRect();
+    resizeScreen();
 	}
-  
   //=========wheel 이벤트=========
   let startY, moveY;
 
