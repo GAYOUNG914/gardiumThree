@@ -9,13 +9,10 @@ const canvas = document.querySelector('#three-canvas');
 const $currentPointer = document.querySelector('.current-pointer');
 const $map = document.querySelector('.map');
 const $popInner  = document.querySelectorAll('.inner');
-const $wrap = document.getElementById('sizing-camera-mesh-scale-wrap');
-let wrapRect;
-wrapRect = $wrap.getBoundingClientRect();
+
 let isMobile = Mobile();
 let isRequestRender;
 let a,btnIndiv,popupBtn;
-let startFov, startView;
 
 const animFrames = 250;
 const animDuration = 10.416666984458105;
@@ -27,10 +24,6 @@ const locationInfos = [
   { location: 'hall-c',  name: 'Section 04',elem: $container.querySelector('.popup .inner[data-pop="hall-c"]'), title:$container.querySelectorAll('.title-inner[data-title="hall-c"] .letter'), time: [204/animFrames * animDuration], type: 'stop', isConfirm: false, },
   { location: 'end',  name: '',  elem: $container.querySelector('.popup .inner[data-pop="end"]'), title:$container.querySelector('.title-inner[data-title="end"]'), time: [animDuration - 0.001],type: 'pass', isConfirm: false, size: null, fitElem: $container.querySelector('.popup[data-pop="end"] .contents-end'), fitRect: null, },
 ];
-
-const sizingInfos = [
-  { location: 'avideo-1',name: 'avideo-1',elem: $container.querySelector('#sizing-camera-mesh-scale-wrap'), time: [70/animFrames  * animDuration, 90/animFrames  * animDuration], type: 'pass', isConfirm: false, size: null, fitElem: document.querySelector('.avideo-1'), fitRect: null,},
-]
 
 const screenMeshes = [];
 const screenMeshNames = 'avideo-1, avideo-2, cg-cut-1, cg-cut-2, cg-cut-3, cg-cut-4, cg-cut-5, cg-cut-6, cg-cut-7, cg-cut-8, cg-cut-9, cg-cut-10, unit-74, unit-84, unit-101, unit-124, unit-125, unit-138, end,  '.split(', ');
@@ -125,9 +118,6 @@ const reflectMeshes = {
           else if ( child.name == 'c-floor' )       reflectMeshes.c.origin = child;
           else if ( child.name == 'c-floor-plane' ) reflectMeshes.c.plane = child;
         }
-
-          // changeSizing(sizingInfo, aniTime, startView);
-
       });
       let raycaster = new THREE.Raycaster();
       let mouse = new THREE.Vector2();
@@ -153,10 +143,8 @@ const reflectMeshes = {
         ease: 'Power1.easeInOut',
         duration: 2,
         onUpdate: function() {
-          // animator progress 계산
           animator.progress = Math.max(0, Math.min(1, animator.time/10000));
       
-          // 애니메이션 믹서를 (총 애니메이션 시간 * progress) 시간으로 보내서 애니메이션 이동
           const aniTime = animator.progress * anim.duration;
           mixer.setTime(aniTime);
     
@@ -249,10 +237,8 @@ const reflectMeshes = {
         ease: 'Power1.easeInOut',
         duration: 1,
         onUpdate: function() {
-              // animator progress 계산
               animator.progress = Math.max(0, Math.min(1, animator.time/10000));
           
-              // 애니메이션 믹서를 (총 애니메이션 시간 * progress) 시간으로 보내서 애니메이션 이동
               const aniTime = animator.progress * anim.duration;
               mixer.setTime(aniTime);
 
@@ -264,14 +250,6 @@ const reflectMeshes = {
               $popup.classList.add('on');
               popupClass.classList.add('on');
 
-              for( a of document.querySelectorAll('.letter')){
-                // if(a.style.opacity !== 0){
-                  // setTimeout(function(){hallTitleAnim(hallTitle);},100)
-                  // hallTitleAnim(hallTitle);
-                // }
-              }
-
-
               $map.classList.remove('on');
           
               renderRequest();
@@ -280,7 +258,7 @@ const reflectMeshes = {
       }
 
       function rayCaster(frameName){
-        let directionFrame,mapPointerPercentage; // 목적지 애니메이션 프레임 -- 블렌더에서 확인 가능        
+        let directionFrame,mapPointerPercentage;  
 
         switch (frameName){
           case 'avideo-1':
@@ -292,7 +270,6 @@ const reflectMeshes = {
             mapPointerPercentage = '28%';
             break;            
           case 'cg-cut-1':
-             //중앙 맞추기
             directionFrame = 118;
             mapPointerPercentage = '44%';
             break;            
@@ -337,7 +314,7 @@ const reflectMeshes = {
             return;
         }
 
-          const directionTime = directionFrame / animFrames * animDuration; // 목적지 프레임에 대한 시간 값 계산
+          const directionTime = directionFrame / animFrames * animDuration;
           const directionProgress = directionTime / animDuration;
           const destinationTo = directionProgress * 10000; 
         
@@ -348,10 +325,8 @@ const reflectMeshes = {
           ease: 'Power1.easeInOut',
           duration: 1,
           onUpdate: function() {
-            // animator progress 계산
             animator.progress = Math.max(0, Math.min(1, animator.time/10000));
         
-            // 애니메이션 믹서를 (총 애니메이션 시간 * progress) 시간으로 보내서 애니메이션 이동
             const aniTime = animator.progress * anim.duration;
             mixer.setTime(aniTime);
   
@@ -364,17 +339,13 @@ const reflectMeshes = {
       }
 
       function onMouseClick(event) {
-        // 마우스의 위치를 정규화(normalized)된 좌표로 변환
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
       
-        // Raycaster를 업데이트
         raycaster.setFromCamera(mouse, camera);
       
-        // 객체와의 교차 검사
         let intersects = raycaster.intersectObjects(scene.children);
       
-        // 교차된 객체에 대한 처리
         if (intersects.length > 0) {
           let frameName = intersects[0].object.userData.name;
 
@@ -396,8 +367,6 @@ const reflectMeshes = {
       scene.add(complex);
 
       renderRequest();
-      resizeScreen();
-
 
       for(btnIndiv of document.querySelectorAll('.map-btns .btn')){
         btnIndiv.addEventListener('click',function(e){
@@ -417,124 +386,6 @@ const reflectMeshes = {
         console.error('모델 로딩 중 에러:', error);
     }
   );
-
-  let fovs,viewX,viewY;
-  function resizeScreen(){
-    // const fitHeihgtRatio = (areaHeight - footerHeight*2) / areaHeight;
-    // const sizingValues = { fitFov: fovs, viewX: viewX, viewY: viewY };
-    const currentTime = mixer.time;
-
-    // * startFov, startView 는 휠 gsap, 특정 영역으로 이동하는 gsap가 시작할때, 끝났을 때 한번씩 업데이트
-    if( startFov == null ) startFov = camera.fov;
-    if( startView == null ) startView = camera.view;
-
-    // sizing 값 설정
-    meshes.forEach((mesh)=>{
-
-    // console.log(document.querySelector('.avideo-1').offsetHeight, 'resizeee')
-
-    const sizingInfo = sizingInfos.find(e => e.location === mesh.name);
-    const $screen = $container.querySelector('.avideo-1');
-    
-
-      if (screenMeshNames.indexOf(mesh.name) > -1) {
-        if ( mesh.name == 'avideo-1' ) {
-          // setting min-height 이건 뭔지 모르겠음
-          sizingInfo.fitRect = $screen.getBoundingClientRect();
-
-          // setting sizing
-          const size = new THREE.Box3().setFromObject(mesh);
-          sizingInfo.size = size;
-          sizingInfo.sizeHeight = size.max.y - size.min.y;
-          sizingInfo.sizeDepth = size.max.z - size.min.z;
-
-          mixer.setTime(sizingInfo.time[0]);
-          camera.position.copy(sceneCamera.position);
-          camera.rotation.copy(sceneCamera.rotation);
-    
-          const cameraDistanceFromMesh = camera.position.distanceTo(mesh.position);
-
-          // console.log(sizingInfo.sizeHeight, wrapRect.height, sizingInfo.fitElem.offsetHeight)
-          const targetHeight = sizingInfo.sizeHeight * wrapRect.height / sizingInfo.fitElem.offsetHeight;
-          const fovs = 2 * (180 / Math.PI) * Math.atan(targetHeight / (2 * cameraDistanceFromMesh));
-          const fitRect = sizingInfo.fitRect;
-
-          const viewX = wrapRect.width/2 - fitRect.width/2 - (fitRect.left - wrapRect.left);
-          const viewY = wrapRect.height/2 - fitRect.height/2 - (fitRect.top - wrapRect.top);
-
-          sizingInfo.fitFov = fovs;
-          sizingInfo.viewX = viewX;
-          sizingInfo.viewY = viewY;
-          // console.log(sizingInfo.viewX, sizingInfo.viewY)
-          // 애니메이션 타임 다시 초기화
-          mixer.setTime(currentTime);
-   
-          changeSizing(sizingInfo, currentTime, startView);
-        }
-      }
-    })
-  }
-
-  const changeSizing = function (sizingInfo, aniTime, startView) {
-
-    if ( screenMeshNames.indexOf(sizingInfo.location) == -1 ) return;
-    if ( !sizingInfo.fitElem ) return;
-
-    const targetTime = sizingInfo.time;
-    const targetFov = sizingInfo.fitFov;
-    const viewX = sizingInfo.viewX;
-    const viewY = sizingInfo.viewY;
-  
-    if ( 
-      targetTime.length > 1 ? 
-        Math.abs(aniTime - targetTime[0]) < 0.2 || Math.abs(aniTime - targetTime[1]) < 0.2 :
-        Math.abs(aniTime - targetTime[0]) < 0.2 
-    ) {
-      const gap = startFov - targetFov;
-      const time = targetTime.length > 1 ? 
-        [Math.abs(aniTime - targetTime[0]) * 2, Math.abs(aniTime - targetTime[1]) * 2] : 
-        [Math.abs(aniTime - targetTime[0]) * 2];
-      
-      let progress;
-      if ( time.length == 1 ) {
-        progress = Math.max(0, Math.min(1, 1 - time[0]));
-      } else {
-        progress = 
-          aniTime < targetTime[0] ? Math.max(0, Math.min(1, 1 - time[0])) : 
-          aniTime > targetTime[1] ? Math.max(0, Math.min(1, 1 - time[1])) : 1
-      };
-      startView = aniTime > targetTime[1] ? { offsetX: 0, offsetY: 0 } : startView;
-
-      onSizing( viewX, viewY, gap, progress, startFov, startView);
-
-      if ( aniTime > targetTime[0] && aniTime < targetTime[1] && Math.abs(camera.fov - targetFov) > .3 ) {
-        camera.fov = targetFov;
-      }
-    }
-  }
-
-  const onSizing = function (viewX, viewY, gap, progress, startFov, startView) {
-  // const onSizing = function (viewX, viewY, startFov, startView, areaRect, meshRect) {
-    // 기본 값 설정
-    startFov = startFov ? startFov : 60;
-    startView = startView ? startView : { offsetX: 0, offsetY: 0 };
-
-    const $wrap = document.getElementById('sizing-camera-mesh-scale-wrap');
-    const areaRect = $wrap.getBoundingClientRect();
-
-    camera.fov = startFov - gap*(progress);
-    camera.setViewOffset(
-      areaRect.width, 
-      areaRect.height,
-      startView.offsetX + (viewX - startView.offsetX) * progress,
-      startView.offsetY + (viewY - startView.offsetY) * progress,
-      areaRect.width,
-      areaRect.height
-    );
-  
-    camera.updateProjectionMatrix();
-    renderRequest();
-  }
 
   //=========Loading=========
   document.querySelector('.content-loading').classList.add('active');
@@ -601,7 +452,6 @@ const reflectMeshes = {
 
     mirror.position.copy(floorPlane.position);
     mirror.position.y += 0.002;
-    // mirror.rotation.x = -Math.PI / 2;
     scene.add( mirror );
 
     const material = floor.material.clone();
@@ -632,10 +482,8 @@ const reflectMeshes = {
 		camera.updateProjectionMatrix();
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		renderer.draw(scene, camera);
-
-    wrapRect = $wrap.getBoundingClientRect();
-    resizeScreen();
 	}
+  
   //=========wheel 이벤트=========
   let startY, moveY;
 
@@ -701,11 +549,6 @@ const reflectMeshes = {
           if ( animator.progress == 1 ) animator.time = 10000;
           if ( animator.progress == 0 ) animator.time = 0;
 
-          for (let i = 0; i < sizingInfos.length; i++) {
-            const sizingInfo = sizingInfos[i];
-            changeSizing(sizingInfo, aniTime, startView);
-          }
-
           // ================ 팝업 오픈 ================
           let animationExecuted = false;
 
@@ -727,23 +570,6 @@ const reflectMeshes = {
                 }
               }
             }
-
-          // ================ 사이징 팝업 오픈 ================
-            // if(aniTime < sizingInfos[0].time[0] + 0.1 && aniTime > sizingInfos[0].time[0] - 0.1){
-            //   if (!sizingInfos[0].elem.classList.contains('on') ) {
-
-            //     $map.classList.remove('on');
-            //     sizingInfos[0].elem.classList.add('on');
-            //     resizeScreen();
-
-            //   }
-            // }else{
-            //   if(sizingInfos[0].elem.classList.contains('on')){
-            //     sizingInfos[0].elem.classList.remove('on');
-            //     $map.classList.add('on');
-
-            //   }
-            // }
   
           renderRequest();
         },

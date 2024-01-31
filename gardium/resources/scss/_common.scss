@@ -317,6 +317,7 @@ body * {
   z-index: 999;
   width: 100vw;
   height: 100vh;
+  display: none;
   &.on{
     display: block;
   }
